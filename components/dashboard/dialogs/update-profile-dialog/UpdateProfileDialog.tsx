@@ -27,7 +27,7 @@ const UpdateProfileDialog = () => {
 };
 
 const UpdateProfileContent = ({ closeDialog = () => {} }) => {
-  const { fetchedCurrentUser, updateUser, updateUserCollection, getUser, getUserCollection } = useFirebaseApiContext();
+  const { fetchedCurrentUser, updateUser,  getUser } = useFirebaseApiContext();
   const { convertToBase64, resizeBase64Image } = useUtil();
   const { details } = fetchedCurrentUser;
 
