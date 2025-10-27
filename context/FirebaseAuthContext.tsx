@@ -181,7 +181,8 @@ export default function FirebaseAuthProvider({
       await signOut(auth);
       // successAlert("You’ve signed out successfully!");
       sessionStorage.setItem("isSignedOut", "true");
-      router.push("/sign-in");
+      // router.push("/sign-in");
+      window.location.href = "/sign-in";
     } catch (err: any) {
       errorAlert(err.message || "Internal server error. Please try again later.");
       console.error(err, "=handleSignOut= request error");
@@ -218,8 +219,13 @@ export default function FirebaseAuthProvider({
     setIsLoading(false);
   };
 
-  const handleUpdatePassword = async ({ oldPassword = "",password = "", setIsLoading = (_: boolean) => {}, callback = () => {} }) => {
-    if (!currentUser  || !currentUser.email) return;
+  const handleUpdatePassword = async ({
+    oldPassword = "",
+    password = "",
+    setIsLoading = (_: boolean) => {},
+    callback = () => {},
+  }) => {
+    if (!currentUser || !currentUser.email) return;
     setIsLoading(true);
     try {
       const credential = EmailAuthProvider.credential(currentUser.email, oldPassword);
@@ -296,7 +302,8 @@ export default function FirebaseAuthProvider({
       if (user && adminRoutes.includes(pathname)) {
         router.push("/dashboard");
       } else if (!user && pathname.startsWith("/dashboard")) {
-        router.push("/sign-in");
+        // router.push("/sign-in");
+        window.location.href = "/sign-in";
       }
     });
     return () => unsubscribe();
