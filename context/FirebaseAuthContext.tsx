@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, createContext, useContext } from "react";
 import { auth, db } from "@/config/firebase";
-import { doc, setDoc, getDoc, deleteDoc } from "firebase/firestore";
+import { doc, setDoc, getDoc, deleteDoc, serverTimestamp } from "firebase/firestore";
 import { User } from "firebase/auth";
 import { useRouter } from "next/navigation";
 import { usePathname } from "next/navigation";
@@ -92,7 +92,8 @@ export default function FirebaseAuthProvider({
           photoURL: user.photoURL,
           role: "user",
           rank: "R1",
-          createdAt: new Date(),
+          createdAt: serverTimestamp(),
+          updatedAt: serverTimestamp(),
         });
         setState((prev) => ({ ...prev, isDBUserCreated: true }));
         console.log("New user added to Firestore.");

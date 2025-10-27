@@ -113,15 +113,11 @@ const NavUser = () => {
         </DropdownMenuGroup> */}
         <DropdownMenuSeparator />
         <DropdownMenuItem asChild className="cursor-pointer">
-          <Link className="" href="/profile">
+          <Link className="" href="/dashboard/my-profile">
             My Profile
           </Link>
         </DropdownMenuItem>
-        <DropdownMenuItem asChild className="cursor-pointer">
-          <Link className="" href="/account">
-            Account
-          </Link>
-        </DropdownMenuItem>
+     
         <DropdownMenuSeparator />
         <DropdownMenuItem>
           light/dark toggler <ModeToggle />

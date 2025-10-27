@@ -16,13 +16,13 @@ const page = async ({ params }: { params: Promise<{ slug: string }> }) => {
       label: "Website",
     },
     {
-      label: `${slug} Section`,
+      label: `home page - ${slug} Section`,
     },
   ];
 
   return (
     <main className="about-section-page py-5 px-10">
-      <h2 className="text-2xl mb-3 capitalize">{slug} section</h2>
+      <h2 className="text-2xl mb-3 capitalize">{slug}</h2>
       <BreadcrumbDemo items={breadcrumbItems} />
       <br />
       <br />

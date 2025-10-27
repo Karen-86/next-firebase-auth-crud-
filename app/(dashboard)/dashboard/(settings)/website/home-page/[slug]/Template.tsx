@@ -29,7 +29,7 @@ const Template = ({ slug = "" }) => {
     items: [],
   });
   const [isLoading, setIsLoading] = useState(false);
-  const { fetchedPages, updateContent } = useFirebaseApiContext();
+  const { fetchedPages, createContent, updateContent } = useFirebaseApiContext();
 
   const onChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setState((prev) => ({
@@ -40,14 +40,24 @@ const Template = ({ slug = "" }) => {
 
   const onSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    updateContent({
-      id: state.id,
-      title: state.title,
-      description: state.description,
-      images: state.images,
-      setIsLoading,
-      slug,
-    });
+    if (!state.id) {
+      createContent({
+        title: state.title,
+        description: state.description,
+        images: state.images,
+        setIsLoading,
+        slug,
+      });
+    } else {
+      updateContent({
+        id: state.id,
+        title: state.title,
+        description: state.description,
+        images: state.images,
+        setIsLoading,
+        slug,
+      });
+    }
   };
 
   useEffect(() => {
@@ -129,7 +139,7 @@ const UploadImage = ({
 
   const handleImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files) {
-      if(!state.images) return
+      if (!state.images) return;
       setUploadedImage(e.target.files[0]);
 
       const compressedBlob = await compressImage(e.target.files[0], 300);

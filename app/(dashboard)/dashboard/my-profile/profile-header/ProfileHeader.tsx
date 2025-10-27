@@ -75,7 +75,7 @@ type StateProps = {
 };
 
 const EditProfileContent = ({ closeDialog = () => {} }) => {
-  const { fetchedCurrentUser, updateUser, updateUserCollection, getUser, getUserCollection } = useFirebaseApiContext();
+  const { fetchedCurrentUser, updateUser, updateUserSubCollection, getUser, getUserCollection } = useFirebaseApiContext();
   const { convertToBase64, resizeBase64Image } = useUtil();
   const { details } = fetchedCurrentUser;
 
@@ -168,7 +168,7 @@ const EditProfileContent = ({ closeDialog = () => {} }) => {
       updatedBannerFields.base64URL = "";
     }
 
-    updateUserCollection({
+    updateUserSubCollection({
       userId: currentUser?.uid,
       collectionName: "media",
       collectionId: "banner",

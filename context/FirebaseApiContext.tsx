@@ -14,6 +14,7 @@ import {
   query,
   orderBy,
   Timestamp,
+  serverTimestamp,
 } from "firebase/firestore";
 import useAlert from "@/hooks/useAlert";
 import { useFirebaseAuthContext } from "./FirebaseAuthContext";
@@ -52,6 +53,11 @@ type FetchedPagesProps = {
     isLoading: boolean;
     sections: { [key: string]: any };
   };
+  blogPage: {
+    id: string;
+    isLoading: boolean;
+    sections: { [key: string]: any };
+  };
 };
 
 type FirebaseApiContextType = {
@@ -67,9 +73,18 @@ type FirebaseApiContextType = {
   getUsers: ({ setIsLoading }: { [key: string]: any }) => void;
   updateUser: ({ id, setIsLoading, updatedFields }: { [key: string]: any }) => void;
   deleteUser: ({ id, setIsLoading }: { [key: string]: any }) => void;
-  updateUserCollection: ({ userId, collectionName, collectionId, setIsLoading, updatedFields }: { [key: string]: any }) => void;
+  updateUserSubCollection: ({
+    userId,
+    collectionName,
+    collectionId,
+    setIsLoading,
+    updatedFields,
+  }: {
+    [key: string]: any;
+  }) => void;
   getUserCollection: ({ userId, collectionName, collectionId, setIsLoading }: { [key: string]: any }) => void;
 
+  createContent: ({ id, slug, setIsLoading, ...fields }: { [key: string]: any }) => void;
   updateContent: ({ id, slug, setIsLoading, ...fields }: { [key: string]: any }) => void;
 };
 
@@ -121,6 +136,33 @@ export default function FirebaseApiProvider({
           description: "Lorem Ipsum is simply dummy text of the printing and typesetting industry.",
           images: [{ id: "1", title: "", url: placeholderImage }],
         },
+      },
+    },
+    blogPage: {
+      id: "",
+      isLoading: true,
+      sections: {
+        header: {
+          title: "Header",
+          description: "Lorem Ipsum is simply dummy text of the  typesetting.",
+          images: [{ id: "1", title: "", url: placeholderImage }],
+        },
+        blogList: [
+          {
+            slug: "blog-1",
+            title: "blog 1",
+            description: "Lorem Ipsum is simply dummy text of the  typesetting.",
+            images: [{ id: "1", title: "", url: placeholderImage }],
+            isFeatured: true,
+          },
+          {
+            slug: "blog-2",
+            title: "blog 2",
+            description: "Lorem Ipsum is simply dummy text of the  typesetting.",
+            images: [{ id: "1", title: "", url: placeholderImage }],
+            isFeatured: true,
+          },
+        ],
       },
     },
   });
@@ -187,7 +229,7 @@ export default function FirebaseApiProvider({
     setIsLoading(true);
     try {
       const userDoc = doc(db, "users", id);
-      await updateDoc(userDoc, updatedFields);
+      await updateDoc(userDoc, { ...updatedFields, updatedAt: serverTimestamp() });
       getUsers({});
       successAlert("User information has been updated successfully.");
     } catch (err: any) {
@@ -198,7 +240,7 @@ export default function FirebaseApiProvider({
     callback();
   };
 
-  const updateUserCollection = async ({
+  const updateUserSubCollection = async ({
     userId = "",
     collectionName = "",
     collectionId = "",
@@ -209,7 +251,17 @@ export default function FirebaseApiProvider({
     setIsLoading(true);
 
     try {
-      await setDoc(doc(db, "users", userId, collectionName, collectionId), updatedFields, { merge: true });
+      const docRef = doc(db, "users", userId, collectionName, collectionId);
+      const docSnap = await getDoc(docRef);
+
+      const dataToSave: any = {
+        ...updatedFields,
+        updatedAt: serverTimestamp(),
+      };
+
+      if (!docSnap.exists()) dataToSave.createdAt = serverTimestamp();
+      await setDoc(docRef, dataToSave, { merge: true }); //recommended option, if subCollection dont exist it will create, if exist it will update, also you control id name
+
       // await addDoc(collection(db, "users", userId, "gallery"), {
       //   updatedFields,
       // });
@@ -220,7 +272,7 @@ export default function FirebaseApiProvider({
       // getUsers({});
     } catch (err: any) {
       errorAlert(err.message || "Internal server error. Please try again later.");
-      console.error(err, "=updateUserCollection= request error");
+      console.error(err, "=updateUserSubCollection= request error");
     }
     setIsLoading(false);
     callback();
@@ -239,7 +291,7 @@ export default function FirebaseApiProvider({
       await getDoc(doc(db, "users", userId, collectionName, collectionId));
     } catch (err: any) {
       errorAlert(err.message || "Internal server error. Please try again later.");
-      console.error(err, "=updateUserCollection= request error");
+      console.error(err, "=updateUserSubCollection= request error");
     }
     setIsLoading(false);
     callback();
@@ -300,12 +352,36 @@ export default function FirebaseApiProvider({
     setFetchedPages((prev) => ({ ...prev, homePage: { ...prev.homePage, isLoading: false } }));
   };
 
+  const createContent = async ({ slug = "", setIsLoading = (_: boolean) => {}, ...fields }) => {
+    setIsLoading(true);
+
+    const filteredData = {
+      [slug]: { ...Object.fromEntries(Object.entries(fields).filter(([_, v]) => v)) },
+      createdAt: serverTimestamp(),
+      updatedAt: serverTimestamp(),
+      // createdAt: new Date(),
+      // updatedAt: new Date(),
+    };
+
+    try {
+      const docRef = await addDoc(collection(db, "website-content"), filteredData);
+      getContents({});
+      successAlert("Content has been created successfully.");
+    } catch (err: any) {
+      errorAlert(err.message || "Internal server error. Please try again later.");
+      console.error(err, "=createContent= request error");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   const updateContent = async ({ id = "", slug = "", setIsLoading = (_: boolean) => {}, ...fields }) => {
     setIsLoading(true);
 
     const filteredData = {
       [slug]: { ...Object.fromEntries(Object.entries(fields).filter(([_, v]) => v)) },
-      updatedAt: new Date(),
+      updatedAt: serverTimestamp(),
+      // updatedAt: new Date(),
     };
 
     console.log(filteredData, " filteredData");
@@ -318,8 +394,9 @@ export default function FirebaseApiProvider({
     } catch (err: any) {
       errorAlert(err.message || "Internal server error. Please try again later.");
       console.error(err, "=updateContent= request error");
+    } finally {
+      setIsLoading(false);
     }
-    setIsLoading(false);
   };
 
   useEffect(() => {
@@ -347,9 +424,10 @@ export default function FirebaseApiProvider({
         getUsers,
         updateUser,
         deleteUser,
-        updateUserCollection,
+        updateUserSubCollection,
         getUserCollection,
 
+        createContent,
         updateContent,
       }}
     >
