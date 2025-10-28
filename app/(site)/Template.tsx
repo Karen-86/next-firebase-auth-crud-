@@ -8,9 +8,7 @@ import { useFirebaseApiContext } from "@/context/FirebaseApiContext";
 export default function Template() {
   const { fetchedPages } = useFirebaseApiContext();
 
-  const {
-    homePage: { isLoading },
-  } = fetchedPages;
+  const { isLoading } = fetchedPages;
   return (
     <>
       {isLoading ? (
@@ -70,4 +68,3 @@ const ServicesSection = () => {
     </section>
   );
 };
-

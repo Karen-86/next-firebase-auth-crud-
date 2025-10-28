@@ -51,7 +51,7 @@ const blog = [
   {
     invoice: "2",
     name: "Blog",
-    href: "/dashboard/website/blog/blog",
+    href: "/dashboard/website/blog/blog-list",
     isDisabled: false,
   },
   {

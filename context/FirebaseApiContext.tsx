@@ -19,6 +19,7 @@ import {
 import useAlert from "@/hooks/useAlert";
 import { useFirebaseAuthContext } from "./FirebaseAuthContext";
 import localData from "@/localData";
+import websiteOriginalContent from "@/data/websiteOriginalContent";
 
 const { placeholderImage } = localData.images;
 
@@ -47,19 +48,6 @@ type FetchedUserProps = {
   details: { [key: string]: any };
 };
 
-type FetchedPagesProps = {
-  homePage: {
-    id: string;
-    isLoading: boolean;
-    sections: { [key: string]: any };
-  };
-  blogPage: {
-    id: string;
-    isLoading: boolean;
-    sections: { [key: string]: any };
-  };
-};
-
 type FirebaseApiContextType = {
   fetchedUsers: FetchedUsersProps;
   fetchedCurrentUser: FetchedCurrentUserProps;
@@ -67,7 +55,7 @@ type FirebaseApiContextType = {
   fetchedUser: FetchedUserProps;
   fetchedEvents: FetchedEventsProps;
   fetchEventsHistoryRecords: FetchEventsHistoryRecordsProps;
-  fetchedPages: FetchedPagesProps;
+  fetchedPages: { [key: string]: any };
 
   getUser: ({ setIsLoading }: { [key: string]: any }) => void;
   getUsers: ({ setIsLoading }: { [key: string]: any }) => void;
@@ -82,10 +70,12 @@ type FirebaseApiContextType = {
   }: {
     [key: string]: any;
   }) => void;
-  getUserCollection: ({ userId, collectionName, collectionId, setIsLoading }: { [key: string]: any }) => void;
+  // getUserCollection: ({ userId, collectionName, collectionId, setIsLoading }: { [key: string]: any }) => void;
 
-  createContent: ({ id, slug, setIsLoading, ...fields }: { [key: string]: any }) => void;
+  // createContent: ({ id, slug, setIsLoading, ...fields }: { [key: string]: any }) => void;
+  // updateContent: ({ id, slug, setIsLoading, ...fields }: { [key: string]: any }) => void;
   updateContent: ({ id, slug, setIsLoading, ...fields }: { [key: string]: any }) => void;
+  updateContentSubCollection: ({ userId, collectionName, collectionId, setIsLoading }: { [key: string]: any }) => void;
 };
 
 export const FirebaseApiContext = createContext<FirebaseApiContextType | null>(null);
@@ -120,52 +110,7 @@ export default function FirebaseApiProvider({
     details: {},
   });
 
-  const [fetchedPages, setFetchedPages] = useState<FetchedPagesProps>({
-    homePage: {
-      id: "",
-      isLoading: true,
-      sections: {
-        header: {
-          title: "Header",
-          description: "Lorem Ipsum is simply dummy text of the  typesetting.",
-          images: [{ id: "1", title: "", url: placeholderImage }],
-        },
-
-        contact: {
-          title: "Contact section",
-          description: "Lorem Ipsum is simply dummy text of the printing and typesetting industry.",
-          images: [{ id: "1", title: "", url: placeholderImage }],
-        },
-      },
-    },
-    blogPage: {
-      id: "",
-      isLoading: true,
-      sections: {
-        header: {
-          title: "Header",
-          description: "Lorem Ipsum is simply dummy text of the  typesetting.",
-          images: [{ id: "1", title: "", url: placeholderImage }],
-        },
-        blogList: [
-          {
-            slug: "blog-1",
-            title: "blog 1",
-            description: "Lorem Ipsum is simply dummy text of the  typesetting.",
-            images: [{ id: "1", title: "", url: placeholderImage }],
-            isFeatured: true,
-          },
-          {
-            slug: "blog-2",
-            title: "blog 2",
-            description: "Lorem Ipsum is simply dummy text of the  typesetting.",
-            images: [{ id: "1", title: "", url: placeholderImage }],
-            isFeatured: true,
-          },
-        ],
-      },
-    },
-  });
+  const [fetchedPages, setFetchedPages] = useState(websiteOriginalContent);
 
   const { currentUser, state } = useFirebaseAuthContext();
   const { successAlert, errorAlert } = useAlert();
@@ -278,24 +223,24 @@ export default function FirebaseApiProvider({
     callback();
   };
 
-  const getUserCollection = async ({
-    userId = "",
-    collectionName = "",
-    collectionId = "",
-    setIsLoading = (_: boolean) => {},
-    callback = () => {},
-  }) => {
-    setIsLoading(true);
-    console.log(userId, collectionName, collectionId);
-    try {
-      await getDoc(doc(db, "users", userId, collectionName, collectionId));
-    } catch (err: any) {
-      errorAlert(err.message || "Internal server error. Please try again later.");
-      console.error(err, "=updateUserSubCollection= request error");
-    }
-    setIsLoading(false);
-    callback();
-  };
+  // const getUserCollection = async ({
+  //   userId = "",
+  //   collectionName = "",
+  //   collectionId = "",
+  //   setIsLoading = (_: boolean) => {},
+  //   callback = () => {},
+  // }) => {
+  //   setIsLoading(true);
+  //   console.log(userId, collectionName, collectionId);
+  //   try {
+  //     await getDoc(doc(db, "users", userId, collectionName, collectionId));
+  //   } catch (err: any) {
+  //     errorAlert(err.message || "Internal server error. Please try again later.");
+  //     console.error(err, "=updateUserSubCollection= request error");
+  //   }
+  //   setIsLoading(false);
+  //   callback();
+  // };
 
   const deleteUser = async ({ id = "", callback = () => {}, setIsLoading = (_: boolean) => {} }) => {
     setIsLoading(true);
@@ -317,78 +262,109 @@ export default function FirebaseApiProvider({
   // WEBSITECONTENT
   const getContents = async ({ setIsLoading = (_: boolean) => {} }) => {
     setIsLoading(true);
-    setFetchedPages((prev) => ({ ...prev, homePage: { ...prev.homePage, isLoading: true } }));
+    setFetchedPages((prev) => ({ ...prev, isLoading: true }));
     try {
-      const res = await getDocs(websiteContentRef);
-      const data = res.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
-      if (data && data.length) {
-        // #12345678
-        setFetchedPages((prev) => ({
-          ...prev,
-          homePage: {
-            id: data[0].id,
-            isLoading: false,
-            sections: { ...prev.homePage.sections, ...data[0] },
-          },
-        }));
-      }
-    } catch (err: any) {
-      setFetchedPages((prev) => ({
+      const websiteContentRef = collection(db, "website-content");
+      const blogSubColRef = collection(db, "website-content", "blog-page", "blog");
+
+      const [res, res2] = await Promise.all([getDocs(websiteContentRef), getDocs(blogSubColRef)]);
+
+      const pages = res.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+      const blog = res2.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+      const blogList = blog.map((item: any) => ({ ...item.blog }));
+      // if (pages && pages.length) {
+      setFetchedPages((prev: any) => ({
         ...prev,
         homePage: {
-          ...prev.homePage,
-          isLoading: false,
+          sections: { ...prev.homePage.sections, ...pages.find((item) => item.id === "home-page") },
+        },
+        blogPage: {
+          sections: { ...prev.blogPage.sections, ...pages.find((item) => item.id === "blog-page"), "blog-list": blogList },
         },
       }));
-      setIsLoading(false);
+      // }
+    } catch (err: any) {
       if (err.message == "Missing or insufficient permissions.") {
         console.warn(err, "=getContents= request warning");
         return;
       }
       errorAlert(err.message || "Internal server error. Please try again later.");
       console.error(err, "=getContents= request error");
-    }
-
-    setFetchedPages((prev) => ({ ...prev, homePage: { ...prev.homePage, isLoading: false } }));
-  };
-
-  const createContent = async ({ slug = "", setIsLoading = (_: boolean) => {}, ...fields }) => {
-    setIsLoading(true);
-
-    const filteredData = {
-      [slug]: { ...Object.fromEntries(Object.entries(fields).filter(([_, v]) => v)) },
-      createdAt: serverTimestamp(),
-      updatedAt: serverTimestamp(),
-      // createdAt: new Date(),
-      // updatedAt: new Date(),
-    };
-
-    try {
-      const docRef = await addDoc(collection(db, "website-content"), filteredData);
-      getContents({});
-      successAlert("Content has been created successfully.");
-    } catch (err: any) {
-      errorAlert(err.message || "Internal server error. Please try again later.");
-      console.error(err, "=createContent= request error");
     } finally {
       setIsLoading(false);
+      setFetchedPages((prev) => ({ ...prev, isLoading: false }));
     }
   };
 
-  const updateContent = async ({ id = "", slug = "", setIsLoading = (_: boolean) => {}, ...fields }) => {
+  // const createContent = async ({ slug = "", setIsLoading = (_: boolean) => {}, ...fields }) => {
+  //   setIsLoading(true);
+
+  //   const filteredData = {
+  //     [slug]: { ...Object.fromEntries(Object.entries(fields).filter(([_, v]) => v)) },
+  //     createdAt: serverTimestamp(),
+  //     updatedAt: serverTimestamp(),
+  //     // createdAt: new Date(),
+  //     // updatedAt: new Date(),
+  //   };
+
+  //   try {
+  //     const docRef = await addDoc(collection(db, "website-content"), filteredData);
+  //     getContents({});
+  //     successAlert("Content has been created successfully.");
+  //   } catch (err: any) {
+  //     errorAlert(err.message || "Internal server error. Please try again later.");
+  //     console.error(err, "=createContent= request error");
+  //   } finally {
+  //     setIsLoading(false);
+  //   }
+  // };
+
+  // const updateContent = async ({ id = "", slug = "", setIsLoading = (_: boolean) => {}, ...fields }) => {
+  //   setIsLoading(true);
+
+  //   const filteredData = {
+  //     [slug]: { ...Object.fromEntries(Object.entries(fields).filter(([_, v]) => v)) },
+  //     updatedAt: serverTimestamp(),
+  //     // updatedAt: new Date(),
+  //   };
+
+  //   console.log(filteredData, " filteredData");
+
+  //   try {
+  //     const contentDoc = doc(db, "website-content", id);
+  //     await updateDoc(contentDoc, filteredData);
+  //     getContents({});
+  //     successAlert("Content has been updated successfully.");
+  //   } catch (err: any) {
+  //     errorAlert(err.message || "Internal server error. Please try again later.");
+  //     console.error(err, "=updateContent= request error");
+  //   } finally {
+  //     setIsLoading(false);
+  //   }
+  // };
+
+  const updateContent = async ({
+    contentId = "",
+    section = "",
+    updatedFields = {},
+    setIsLoading = (_: boolean) => {},
+    callback = () => {},
+    ...fields
+  }) => {
     setIsLoading(true);
 
-    const filteredData = {
-      [slug]: { ...Object.fromEntries(Object.entries(fields).filter(([_, v]) => v)) },
-      updatedAt: serverTimestamp(),
-      // updatedAt: new Date(),
-    };
-
-    console.log(filteredData, " filteredData");
-
     try {
-      const contentDoc = doc(db, "website-content", id);
-      await updateDoc(contentDoc, filteredData);
+      const docRef = doc(db, "website-content", contentId);
+      const docSnap = await getDoc(docRef);
+
+      const filteredData = {
+        [section]: { ...Object.fromEntries(Object.entries(fields).filter(([_, v]) => v)) },
+        updatedAt: serverTimestamp(),
+      };
+
+      if (!docSnap.exists()) filteredData.createdAt = serverTimestamp();
+      await setDoc(docRef, filteredData, { merge: true }); //recommended option, if subCollection dont exist it will create, if exist it will update, also you control id name
+
       getContents({});
       successAlert("Content has been updated successfully.");
     } catch (err: any) {
@@ -396,7 +372,39 @@ export default function FirebaseApiProvider({
       console.error(err, "=updateContent= request error");
     } finally {
       setIsLoading(false);
+      callback();
     }
+  };
+
+  const updateContentSubCollection = async ({
+    pageId = "",
+    collectionName = "",
+    collectionId = "",
+    fields = [],
+    setIsLoading = (_: boolean) => {},
+    callback = () => {},
+  }) => {
+    setIsLoading(true);
+
+    try {
+      const docRef = doc(db, "website-content", pageId, collectionName, collectionId);
+      const docSnap = await getDoc(docRef);
+
+      const filteredData: any = {
+        blog: fields,
+        updatedAt: serverTimestamp(),
+      };
+
+      if (!docSnap.exists()) filteredData.createdAt = serverTimestamp();
+      await setDoc(docRef, filteredData, { merge: true }); //recommended option, if subCollection dont exist it will create, if exist it will update, also you control id name
+      getContents({});
+      successAlert("Content has been updated successfully.");
+    } catch (err: any) {
+      errorAlert(err.message || "Internal server error. Please try again later.");
+      console.error(err, "=updateContentSubCollection= request error");
+    }
+    setIsLoading(false);
+    callback();
   };
 
   useEffect(() => {
@@ -425,10 +433,12 @@ export default function FirebaseApiProvider({
         updateUser,
         deleteUser,
         updateUserSubCollection,
-        getUserCollection,
+        // getUserCollection,
 
-        createContent,
+        // createContent,
+        // updateContent,
         updateContent,
+        updateContentSubCollection,
       }}
     >
       {children}

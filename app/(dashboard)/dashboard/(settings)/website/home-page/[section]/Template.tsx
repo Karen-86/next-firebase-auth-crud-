@@ -13,23 +13,19 @@ type ImagesProps = {
 };
 
 type StateProps = {
-  id: string;
   title: string;
   description: string;
   images?: ImagesProps[];
-  items?: { [key: string]: any }[];
 };
 
-const Template = ({ slug = "" }) => {
+const Template = ({ section = "" }) => {
   const [state, setState] = useState<StateProps>({
-    id: "",
     title: "",
     description: "",
     images: [],
-    items: [],
   });
   const [isLoading, setIsLoading] = useState(false);
-  const { fetchedPages, createContent, updateContent } = useFirebaseApiContext();
+  const { fetchedPages, updateContent } = useFirebaseApiContext();
 
   const onChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setState((prev) => ({
@@ -40,32 +36,20 @@ const Template = ({ slug = "" }) => {
 
   const onSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!state.id) {
-      createContent({
-        title: state.title,
-        description: state.description,
-        images: state.images,
-        setIsLoading,
-        slug,
-      });
-    } else {
       updateContent({
-        id: state.id,
+        contentId: 'home-page',
+        section,
         title: state.title,
         description: state.description,
         images: state.images,
         setIsLoading,
-        slug,
       });
-    }
   };
 
   useEffect(() => {
-    const id = fetchedPages.homePage.id;
-    const { title, description, images } = fetchedPages.homePage.sections[slug];
+    const { title, description, images } = fetchedPages.homePage.sections[section];
     setState((prev) => ({
       ...prev,
-      id,
       title,
       description,
       images,

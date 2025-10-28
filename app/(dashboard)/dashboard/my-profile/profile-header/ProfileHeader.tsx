@@ -75,7 +75,7 @@ type StateProps = {
 };
 
 const EditProfileContent = ({ closeDialog = () => {} }) => {
-  const { fetchedCurrentUser, updateUser, updateUserSubCollection, getUser, getUserCollection } = useFirebaseApiContext();
+  const { fetchedCurrentUser, updateUser, updateUserSubCollection, getUser } = useFirebaseApiContext();
   const { convertToBase64, resizeBase64Image } = useUtil();
   const { details } = fetchedCurrentUser;
 

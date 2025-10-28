@@ -2,8 +2,8 @@ import React from "react";
 import { BreadcrumbDemo } from "@/components/index";
 import Template from "./Template";
 
-const page = async ({ params }: { params: Promise<{ slug: string }> }) => {
-  const slug = (await params).slug;
+const page = async ({ params }: { params: Promise<{ section: string }> }) => {
+  const section = (await params).section;
   // if (Number(slug) > 3) notFound();
 
   const breadcrumbItems = [
@@ -16,17 +16,17 @@ const page = async ({ params }: { params: Promise<{ slug: string }> }) => {
       label: "Website",
     },
     {
-      label: `home page - ${slug} Section`,
+      label: `blog page - ${section} Section`,
     },
   ];
 
   return (
     <main className="about-section-page py-5 px-10">
-      <h2 className="text-2xl mb-3 capitalize">{slug}</h2>
+      <h2 className="text-2xl mb-3 capitalize">{section}</h2>
       <BreadcrumbDemo items={breadcrumbItems} />
       <br />
       <br />
-      <Template slug={slug} />
+      <Template section={section} />
     </main>
   );
 };

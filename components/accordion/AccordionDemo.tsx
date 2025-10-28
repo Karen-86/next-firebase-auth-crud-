@@ -10,31 +10,34 @@ type ItemsProps = {
 type AccordionDemoProps = {
   className?: string;
   triggerClassName?: string;
+  contentClassName?: string;
+  itemClassName?: string;
   items: ItemsProps[];
   type?: "single" | "multiple";
 };
 
-export function AccordionDemo({ className = "",triggerClassName  = '' , items = [], type = "single" }: AccordionDemoProps) {
+export function AccordionDemo({
+  className = "",
+  triggerClassName = "",
+  contentClassName = "",
+  itemClassName = "",
+  items = [],
+  type = "single",
+}: AccordionDemoProps) {
   /* for multiple type remove collapsible attribute*/
   return (
-    <Accordion
-      type={type}
-      {...(type === "single" ? { collapsible: true } : {})}
-      className={`accordion-demo ${className}`}
-    >
-      {items.map((item, index) => {
+    <Accordion  type={type} {...(type === "single" ? { collapsible: true } : {})} className={`accordion-demo ${className}`}>
+      {items.map((item:any, index) => {
         return (
-          <AccordionItem value={`item-${uuidv4()}`} key={index}>
+          <AccordionItem className={`${itemClassName} `} value={`item-${uuidv4()}`} key={index}>
             <AccordionTrigger className={`${triggerClassName} cursor-pointer`}>{item.trigger}</AccordionTrigger>
-            <AccordionContent>{item.content}</AccordionContent>
+            <AccordionContent className={contentClassName}>{item.content}</AccordionContent>
           </AccordionItem>
         );
       })}
     </Accordion>
   );
 }
-
-
 
 // CUSTOM PlusIcon MinusIcon version
 
