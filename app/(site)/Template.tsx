@@ -31,7 +31,7 @@ const HeroSection = () => {
   const { title, description, images } = fetchedPages.homePage.sections.header;
 
   return (
-    <section className="!pt-[80px] showcase text-center sm:text-left  lg:min-h-[calc(100vh-80px)] flex items-center" id="home">
+    <section className="!pt-[80px] hero text-center sm:text-left  lg:min-h-[calc(100vh-80px)] flex items-center" id="home-page">
       <motion.div
         onViewportEnter={() => setIsInView(true)}
         viewport={{ amount: 0.7 }}

@@ -14,6 +14,9 @@ export { DialogDemo } from "./dialog/DialogDemo.tsx";
 export { SelectDemo } from "./select/select/SelectDemo.tsx";
 export { TooltipDemo } from "./tooltip/TooltipDemo.tsx";
 
+// CARDS
+export { default as BlogCard } from "./cards/blog-card/BlogCard.tsx";
+
 
 // DASHBOARD
 export { default as NavUser } from "./dashboard/nav-user/NavUser.tsx";
@@ -25,3 +28,4 @@ export { default as UpdateProfileDialog } from "./dashboard/dialogs/update-profi
 export { default as AddPasswordDialog } from "./dashboard/dialogs/add-password-dialog/AddPasswordDialog.tsx";
 export { default as UpdatePasswordDialog } from "./dashboard/dialogs/update-password-dialog/UpdatePasswordDialog.tsx";
 export { TableDemo } from "./table/TableDemo.tsx";
+

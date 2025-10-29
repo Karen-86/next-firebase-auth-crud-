@@ -36,8 +36,9 @@ const Template = ({ section = "" }) => {
 
   const onSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-      updateContent({
-        contentId: 'home-page',
+    updateContent({
+        collectionName: 'website-content',
+        documentId: 'home-page',
         section,
         title: state.title,
         description: state.description,

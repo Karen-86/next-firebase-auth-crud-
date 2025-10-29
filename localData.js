@@ -7,6 +7,7 @@ const images = {
   notFoundImage: "/assets/images/not-found.webp",
   bannerPlaceholderImage: "/assets/images/banner-placeholder.jpeg",
   ellipsisPreloaderImage: "/assets/images/ellipsis-preloader.gif",
+  preloaderImage: "/assets/images/preloader.gif",
 };
 
 const localData = {
@@ -111,6 +112,7 @@ const localData = {
         />
       </svg>
     ),
+
   },
 };
 

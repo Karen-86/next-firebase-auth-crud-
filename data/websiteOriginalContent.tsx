@@ -26,16 +26,7 @@ const websiteContent = {
         description: "Lorem Ipsum is simply dummy text of the  typesetting.",
         images: [{ id: "1", title: "", url: placeholderImage }],
       },
-      'blog-list': [
-        {
-          slug: "",
-          title: "",
-          description: "",
-          images: [{ id: "1", title: "", url: placeholderImage }],
-          isFeatured: true,
-        },
-
-      ],
+      "blog-list": [],
     },
   },
 };

@@ -15,17 +15,16 @@ const Template = ({ section = "" }) => {
   const { fetchedPages } = useFirebaseApiContext();
 
   const [filteredBlogList, setFilteredBlogList] = useState([]);
+  const blogList = fetchedPages.blogPage.sections["blog-list"];
 
-  useEffect(() => {
-    const blogList = fetchedPages.blogPage.sections["blog-list"];
-    setFilteredBlogList(blogList);
-  }, [fetchedPages]);
+  useEffect(() => setFilteredBlogList(blogList), [fetchedPages]);
 
   const populateList = () => {
     setFilteredBlogList((prev): any => {
       return [
         ...prev,
         {
+          id: uuidv4(),
           slug: `slug-${uuidv4()}`,
           title: "",
           description: "",
@@ -34,7 +33,6 @@ const Template = ({ section = "" }) => {
         },
       ];
     });
-
   };
 
   if (section !== "blog-list") return "not a blog list";
@@ -55,7 +53,7 @@ const Template = ({ section = "" }) => {
           })}
         />
       ) : (
-        <h2 className="text-3xl text-gray-300">Empty</h2>
+        <h2 className="text-3xl text-gray-300 mb-[1rem]">Empty</h2>
       )}
 
       {filteredBlogList.length === fetchedPages.blogPage.sections["blog-list"].length && (
@@ -78,6 +76,7 @@ type ImagesProps = {
 };
 
 type StateProps = {
+  id: string;
   slug: string;
   title: string;
   description: string;
@@ -86,6 +85,7 @@ type StateProps = {
 
 const BlogItem = ({ blogItem = {}, filteredBlogList = [] }: any) => {
   const [state, setState] = useState<StateProps>({
+    id: "",
     slug: "",
     title: "",
     description: "",
@@ -104,11 +104,13 @@ const BlogItem = ({ blogItem = {}, filteredBlogList = [] }: any) => {
   const onSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     updateContentSubCollection({
-      pageId: "blog-page",
-      collectionName: "blog",
-      collectionId: state.slug,
+      collectionName: "website-content",
+      documentId: "blog-page",
+      subCollectionName: "blog",
+      subDocumentId: state.id,
       setIsLoading,
       fields: {
+        id: state.id,
         slug: state.slug,
         title: state.title,
         description: state.description,
@@ -168,7 +170,7 @@ const BlogItem = ({ blogItem = {}, filteredBlogList = [] }: any) => {
           text={`${isLoading ? "Updating..." : "Update"} `}
           className={`w-full`}
           disabled={
-            (filteredBlogList.find((item: any) => item.slug == state.slug) && state.slug !== blogItem.slug) ||
+            (filteredBlogList.find((item: any) => item.slug.trim() == state.slug.trim()) && state.slug !== blogItem.slug) ||
             !state.slug ||
             isLoading
           }

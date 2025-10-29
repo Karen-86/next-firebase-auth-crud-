@@ -13,7 +13,7 @@ const { logo } = localData.images;
 export const navLinks = [
   { title: "Home", href: "/" },
   { title: "About", href: "/about" },
-  { title: "Products", href: "/products" },
+  { title: "Blog", href: "/blog" },
 ];
 
 export const dropdownLinksModules: { title: string; href: string; description: string }[] = [
@@ -36,10 +36,10 @@ export const dropdownLinksModules: { title: string; href: string; description: s
 
 export default function Navbar() {
   const { currentUser } = useFirebaseAuthContext();
-  console.log(currentUser)
+
   return (
     <nav className="navbar absolute w-full">
-      <div className="container  py-3 flex items-center justify-between ">
+      <div className="container py-3 flex items-center justify-between ">
         <Link href="/">
           <img src={logo} alt="" className="max-w-[50px] h-auto " />
         </Link>

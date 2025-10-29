@@ -272,6 +272,7 @@ export default function FirebaseApiProvider({
       const pages = res.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
       const blog = res2.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
       const blogList = blog.map((item: any) => ({ ...item.blog }));
+
       // if (pages && pages.length) {
       setFetchedPages((prev: any) => ({
         ...prev,
@@ -344,7 +345,8 @@ export default function FirebaseApiProvider({
   // };
 
   const updateContent = async ({
-    contentId = "",
+    collectionName = "",
+    documentId = "",
     section = "",
     updatedFields = {},
     setIsLoading = (_: boolean) => {},
@@ -354,7 +356,7 @@ export default function FirebaseApiProvider({
     setIsLoading(true);
 
     try {
-      const docRef = doc(db, "website-content", contentId);
+      const docRef = doc(db, collectionName, documentId);
       const docSnap = await getDoc(docRef);
 
       const filteredData = {
@@ -377,9 +379,10 @@ export default function FirebaseApiProvider({
   };
 
   const updateContentSubCollection = async ({
-    pageId = "",
     collectionName = "",
-    collectionId = "",
+    documentId = "",
+    subCollectionName = "",
+    subDocumentId = "",
     fields = [],
     setIsLoading = (_: boolean) => {},
     callback = () => {},
@@ -387,7 +390,7 @@ export default function FirebaseApiProvider({
     setIsLoading(true);
 
     try {
-      const docRef = doc(db, "website-content", pageId, collectionName, collectionId);
+      const docRef = doc(db, collectionName, documentId, subCollectionName, subDocumentId);
       const docSnap = await getDoc(docRef);
 
       const filteredData: any = {
