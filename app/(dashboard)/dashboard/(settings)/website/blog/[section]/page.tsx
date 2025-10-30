@@ -21,7 +21,7 @@ const page = async ({ params }: { params: Promise<{ section: string }> }) => {
   ];
 
   return (
-    <main className="about-section-page py-5 px-10">
+    <main className="about-section-page py-5 px-5">
       <h2 className="text-2xl mb-3 capitalize">{section}</h2>
       <BreadcrumbDemo items={breadcrumbItems} />
       <br />

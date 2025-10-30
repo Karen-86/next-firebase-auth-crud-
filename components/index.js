@@ -13,6 +13,8 @@ export { DropdownMenuDemo } from "./dropdown-menu/dropdown-menu-demo/DropdownMen
 export { DialogDemo } from "./dialog/DialogDemo.tsx";
 export { SelectDemo } from "./select/select/SelectDemo.tsx";
 export { TooltipDemo } from "./tooltip/TooltipDemo.tsx";
+export { default as RichTextEditorDemo } from "./rich-text-editor/RichTextEditorDemo.tsx";
+
 
 // CARDS
 export { default as BlogCard } from "./cards/blog-card/BlogCard.tsx";
@@ -27,5 +29,6 @@ export { default as UpdateEmailDialog } from "./dashboard/dialogs/update-email-d
 export { default as UpdateProfileDialog } from "./dashboard/dialogs/update-profile-dialog/UpdateProfileDialog.tsx";
 export { default as AddPasswordDialog } from "./dashboard/dialogs/add-password-dialog/AddPasswordDialog.tsx";
 export { default as UpdatePasswordDialog } from "./dashboard/dialogs/update-password-dialog/UpdatePasswordDialog.tsx";
+export { default as UploadImageDemo } from "./dashboard/upload-image/UploadImageDemo.tsx";
 export { TableDemo } from "./table/TableDemo.tsx";
 

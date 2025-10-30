@@ -1,10 +1,9 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { InputDemo, ButtonDemo } from "@/components/index";
+import { InputDemo, ButtonDemo, UploadImageDemo } from "@/components/index";
 import { useFirebaseApiContext } from "@/context/FirebaseApiContext";
 import { Card, CardHeader } from "@/components/ui/card";
-import useUtil from "@/hooks/useUtil";
 
 type ImagesProps = {
   id: string;
@@ -86,7 +85,7 @@ const Template = ({ section = "" }) => {
             />
             {state.images &&
               state.images.map((item: ImagesProps) => {
-                return <UploadImage key={item.id} {...item} state={state} setState={setState} />;
+                return <UploadImageDemo key={item.id} {...item} state={state} setState={setState} />;
               })}
 
             {/* {state.items &&
@@ -97,72 +96,10 @@ const Template = ({ section = "" }) => {
               text={`${isLoading ? "Updating..." : "Update"} `}
               className={`w-full`}
               disabled={isLoading}
-              // variant="outline"
-              // onClick={() => handleSignInWithGoogle({})}
             />
           </form>
         </CardHeader>
       </Card>
-    </div>
-  );
-};
-
-const UploadImage = ({
-  id = "",
-  url = "",
-  state,
-  setState,
-}: {
-  id: string;
-  url: string;
-  state: StateProps;
-  setState: React.Dispatch<React.SetStateAction<StateProps>>;
-}) => {
-  const [uploadedImage, setUploadedImage] = useState<File | null>(null);
-
-  const { compressImage, convertToBase64 } = useUtil();
-
-  const handleImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files) {
-      if (!state.images) return;
-      setUploadedImage(e.target.files[0]);
-
-      const compressedBlob = await compressImage(e.target.files[0], 300);
-      const imageBase64 = await convertToBase64(compressedBlob);
-
-      let tempImages = [...state.images];
-      tempImages = tempImages.map((item) => {
-        if (item.id !== id) return { ...item };
-        return {
-          ...item,
-          url: imageBase64,
-        };
-      });
-      setState((prev) => ({ ...prev, images: tempImages }));
-    }
-  };
-
-  return (
-    <div className="flex justify-center items-center border-2 border-dashed border-input p-6 rounded-md mb-3">
-      <label className="cursor-pointer text-gray-600 font-semibold text-sm">
-        {uploadedImage ? (
-          <div className="text-center">
-            <img
-              src={URL.createObjectURL(uploadedImage)}
-              alt="uploaded"
-              className="w-[300px] h-[200px] object-contain mb-3 mx-auto block "
-            />
-            {/* <p>Image Uploaded</p> */}
-          </div>
-        ) : (
-          <div className="text-center">
-            <img src={url} alt="" className="w-[300px] h-[200px] object-contain mb-3 mx-auto block" />
-            {/* {plusImage} */}
-            {/* <p>Click to upload image</p> */}
-          </div>
-        )}
-        <input type="file" className="hidden" accept="image/*" onChange={handleImageChange} />
-      </label>
     </div>
   );
 };

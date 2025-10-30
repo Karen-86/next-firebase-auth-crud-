@@ -1,4 +1,5 @@
 "use client";
+// import "@/components/blocks/editor-x/editor.css";
 
 import React, { useEffect, useState } from "react";
 import { BlogCard, LoadingScreen, BreadcrumbDemo, ButtonDemo } from "@/components/index.js";
@@ -39,7 +40,8 @@ export default function BlogDetails({ slug = "" }) {
   );
 }
 
-const HeroSection = ({ id = "", image = "", title = "", description = "" }) => {
+
+const HeroSection = ({ id = "", image = "", title = "", description = "", content = "" }) => {
   console.log(title, "[[[[[[[[[[[[[[[[[[[[[[[[");
   const [src, setSrc] = useState(preloaderImage);
 
@@ -60,7 +62,10 @@ const HeroSection = ({ id = "", image = "", title = "", description = "" }) => {
           <div className="relative pt-[56.25%]">
             <Image src={src} alt={title} fill />
           </div>
-          <div className="col-md-9">
+
+          <div className="prose prose-neutral max-w-none" dangerouslySetInnerHTML={{ __html: content }}></div>
+
+          {/* <div className="col-md-9">
             <img src="/system/ckfinder/userfiles/files/Blog%20Images/Blog%20Images%202/Can%20I%20Sell%20My%20Holiday%20Package.jpg" />
             <div></div>
             <h2 className="purple latoBold">Can I Sell My Package Holiday?</h2>
@@ -433,7 +438,7 @@ const HeroSection = ({ id = "", image = "", title = "", description = "" }) => {
                 </div>{" "}
               </div>
             </div>
-          </div>
+          </div> */}
         </div>
       )}
     </section>

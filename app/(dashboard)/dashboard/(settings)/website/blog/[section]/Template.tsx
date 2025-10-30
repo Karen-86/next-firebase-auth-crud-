@@ -1,10 +1,8 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { InputDemo, ButtonDemo, AccordionDemo } from "@/components/index";
+import { InputDemo, ButtonDemo, AccordionDemo, RichTextEditorDemo, UploadImageDemo } from "@/components/index";
 import { useFirebaseApiContext } from "@/context/FirebaseApiContext";
-import { Card, CardHeader } from "@/components/ui/card";
-import useUtil from "@/hooks/useUtil";
 import { PlusIcon } from "lucide-react";
 import localData from "@/localData";
 import { v4 as uuidv4 } from "uuid";
@@ -13,6 +11,7 @@ const { placeholderImage } = localData.images;
 
 const Template = ({ section = "" }) => {
   const { fetchedPages } = useFirebaseApiContext();
+  const { isLoading } = fetchedPages;
 
   const [filteredBlogList, setFilteredBlogList] = useState([]);
   const blogList = fetchedPages.blogPage.sections["blog-list"];
@@ -25,11 +24,12 @@ const Template = ({ section = "" }) => {
         ...prev,
         {
           id: uuidv4(),
-          slug: `slug-${uuidv4()}`,
+          slug: `${uuidv4()}`,
           title: "",
           description: "",
           images: [{ id: "1", title: "", url: placeholderImage }],
           isFeatured: true,
+          isNewBlog: true,
         },
       ];
     });
@@ -42,7 +42,7 @@ const Template = ({ section = "" }) => {
         <AccordionDemo
           type="multiple"
           className=""
-          itemClassName={`!border rounded-lg mb-[0.5rem] overflow-hidden`}
+          itemClassName={`!border rounded-md mb-[0.5rem] overflow-hidden`}
           triggerClassName="!rounded-none text-[16px] font-normal !no-underline p-4 hover:bg-slate-100 rounded-md"
           items={filteredBlogList.map((blogItem: any, index: any) => {
             return {
@@ -58,10 +58,11 @@ const Template = ({ section = "" }) => {
 
       {filteredBlogList.length === fetchedPages.blogPage.sections["blog-list"].length && (
         <ButtonDemo
+          disabled={isLoading}
           onClick={populateList}
           icon={<PlusIcon />}
           className="w-full min-h-[56px]"
-          variant="outline"
+          variant="secondary"
           text="Create New Blog"
         />
       )}
@@ -80,8 +81,12 @@ type StateProps = {
   slug: string;
   title: string;
   description: string;
+  content: string;
+  editorState: any;
   images?: ImagesProps[];
 };
+
+import { initialValue } from "@/components/rich-text-editor/RichTextEditorDemo";
 
 const BlogItem = ({ blogItem = {}, filteredBlogList = [] }: any) => {
   const [state, setState] = useState<StateProps>({
@@ -89,6 +94,8 @@ const BlogItem = ({ blogItem = {}, filteredBlogList = [] }: any) => {
     slug: "",
     title: "",
     description: "",
+    content: "",
+    editorState: null,
     images: [],
   });
   const [isLoading, setIsLoading] = useState(false);
@@ -114,21 +121,20 @@ const BlogItem = ({ blogItem = {}, filteredBlogList = [] }: any) => {
         slug: state.slug,
         title: state.title,
         description: state.description,
+        content: state.content,
+        editorState: state.editorState,
         images: state.images,
       },
     });
   };
 
-  useEffect(() => setState(blogItem), [blogItem]);
-
-  // useEffect(() => {
-  //   console.log(state, " state");
-  // }, [state]);
+  useEffect(() => {
+    const tempState = { ...blogItem, editorState: (blogItem.editorState && JSON.parse(blogItem.editorState)) || initialValue };
+    setState(tempState);
+  }, [blogItem]);
 
   return (
-    <div className="p-6">
-      {/* <Card> */}
-      {/* <CardHeader> */}
+    <div className="p-4">
       <form action="" onSubmit={onSubmit}>
         <InputDemo
           label="Slug"
@@ -159,87 +165,25 @@ const BlogItem = ({ blogItem = {}, filteredBlogList = [] }: any) => {
         />
         {state.images &&
           state.images.map((item: ImagesProps) => {
-            return <UploadImage key={item.id} {...item} state={state} setState={setState} />;
+            return <UploadImageDemo key={item.id} {...item} state={state} setState={setState} />;
           })}
+
+        {state.editorState && <RichTextEditorDemo state={state} setState={setState} className="mb-5" label="Content" />}
 
         {/* {state.items &&
               state.items.map((item: { [key: string]: any }) => {
                 return <div>fdsf</div>;
               })} */}
         <ButtonDemo
-          text={`${isLoading ? "Updating..." : "Update"} `}
+          text={`${isLoading ? (blogItem.isNewBlog ? "Creating..." : "Updating...") : blogItem.isNewBlog ? "Create" : "Update"} `}
           className={`w-full`}
           disabled={
             (filteredBlogList.find((item: any) => item.slug.trim() == state.slug.trim()) && state.slug !== blogItem.slug) ||
             !state.slug ||
             isLoading
           }
-          // variant="outline"
-          // onClick={() => handleSignInWithGoogle({})}
         />
       </form>
-      {/* </CardHeader> */}
-      {/* </Card> */}
-    </div>
-  );
-};
-
-const UploadImage = ({
-  id = "",
-  url = "",
-  state,
-  setState,
-}: {
-  id: string;
-  url: string;
-  state: StateProps;
-  setState: React.Dispatch<React.SetStateAction<StateProps>>;
-}) => {
-  const [uploadedImage, setUploadedImage] = useState<File | null>(null);
-
-  const { compressImage, convertToBase64 } = useUtil();
-
-  const handleImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files) {
-      if (!state.images) return;
-      setUploadedImage(e.target.files[0]);
-
-      const compressedBlob = await compressImage(e.target.files[0], 300);
-      const imageBase64 = await convertToBase64(compressedBlob);
-
-      let tempImages = [...state.images];
-      tempImages = tempImages.map((item) => {
-        if (item.id !== id) return { ...item };
-        return {
-          ...item,
-          url: imageBase64,
-        };
-      });
-      setState((prev) => ({ ...prev, images: tempImages }));
-    }
-  };
-
-  return (
-    <div className="flex justify-center items-center border-2 border-dashed border-input p-6 rounded-md mb-3">
-      <label className="cursor-pointer text-gray-600 font-semibold text-sm">
-        {uploadedImage ? (
-          <div className="text-center">
-            <img
-              src={URL.createObjectURL(uploadedImage)}
-              alt="uploaded"
-              className="w-[300px] h-[200px] object-contain mb-3 mx-auto block "
-            />
-            {/* <p>Image Uploaded</p> */}
-          </div>
-        ) : (
-          <div className="text-center">
-            <img src={url} alt="" className="w-[300px] h-[200px] object-contain mb-3 mx-auto block" />
-            {/* {plusImage} */}
-            {/* <p>Click to upload image</p> */}
-          </div>
-        )}
-        <input type="file" className="hidden" accept="image/*" onChange={handleImageChange} />
-      </label>
     </div>
   );
 };

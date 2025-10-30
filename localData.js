@@ -1,10 +1,10 @@
 const images = {
   logo: "/assets/images/logo.png",
   exampleImage: "/assets/images/example.png",
-  placeholderImage: "/assets/images/placeholder.jpg",
-  avatarPlaceholderImage: "/assets/images/avatar-placeholder.png",
   googleLogoIcon: "/assets/images/icons/google-logo.png",
   notFoundImage: "/assets/images/not-found.webp",
+  placeholderImage: "/assets/images/placeholder.jpeg",
+  avatarPlaceholderImage: "/assets/images/avatar-placeholder.png",
   bannerPlaceholderImage: "/assets/images/banner-placeholder.jpeg",
   ellipsisPreloaderImage: "/assets/images/ellipsis-preloader.gif",
   preloaderImage: "/assets/images/preloader.gif",

@@ -1,3 +1,5 @@
+'use client'
+
 import {
   Table,
   TableBody,
@@ -11,6 +13,7 @@ import {
 import localData from "@/localData";
 import { ButtonDemo } from "@/components/index";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 
 const { penIcon } = localData.svgs;
 // const invoices = [
@@ -68,6 +71,7 @@ type InvoicesProps = {
 };
 
 export function TableDemo({ invoices = [] }: InvoicesProps) {
+  const router = useRouter();
   return (
     <div className="rounded-md  overflow-hidden">
       <Table className="">
@@ -82,17 +86,21 @@ export function TableDemo({ invoices = [] }: InvoicesProps) {
         <TableBody>
           {invoices.map((invoice, index) => (
             <TableRow
+              onClick={() => {
+                if (!invoice.isDisabled) router.push(invoice.href);
+              }}
               key={invoice.invoice}
-              className={` ${
-                invoice.isDisabled ? "opacity-20 pointer-events-none" : ""
-              } `}
+              className={` ${invoice.isDisabled ? "opacity-20 pointer-events-none" : ""} cursor-pointer group`}
             >
               <TableCell className="font-medium px-5 py-[10px]">{invoice.invoice}</TableCell>
-              <TableCell className=" px-5 py-[10px]">{invoice.name}</TableCell>
-              <TableCell className="text-right px-5 ">
-                <Link href={invoice.href}>
-                  <ButtonDemo icon={penIcon} variant="ghost" size="icon" className="h-auto w-auto  " />
-                </Link>
+              <TableCell className=" px-5 py-[10px]">
+                <div className=" group-hover:underline">
+
+                {invoice.name}
+                </div>
+              </TableCell>
+              <TableCell className="text-right px-5">
+                <ButtonDemo icon={penIcon} variant="ghost" size="icon" className="h-auto w-auto pointer-events-none" />
               </TableCell>
             </TableRow>
           ))}

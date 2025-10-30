@@ -20,7 +20,8 @@ const eslintConfig = [
         "@next/next/no-img-element": "off",
         "jsx-a11y/alt-text": "off",
         '@next/next/no-html-link-for-pages': 'off',
-        "react/no-unescaped-entities": "off"
+        "react/no-unescaped-entities": "off",
+        '@typescript-eslint/ban-ts-comment': 'off'
       },
   },
 ];
