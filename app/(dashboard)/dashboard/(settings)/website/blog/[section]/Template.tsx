@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { InputDemo, ButtonDemo, AccordionDemo, RichTextEditorDemo, UploadImageDemo } from "@/components/index";
+import { InputDemo, ButtonDemo, AccordionDemo, RichTextEditorDemo, UploadImageDemo, BlogFormSkeleton } from "@/components/index";
 import { useFirebaseApiContext } from "@/context/FirebaseApiContext";
 import { PlusIcon } from "lucide-react";
 import localData from "@/localData";
@@ -11,13 +11,15 @@ const { placeholderImage } = localData.images;
 
 const Template = ({ section = "" }) => {
   const { fetchedPages } = useFirebaseApiContext();
+  const { isLoading: isPageLoading } = fetchedPages;
   const { isLoading } = fetchedPages;
 
+  console.log(fetchedPages)
   const [filteredBlogList, setFilteredBlogList] = useState([]);
-  const blogList = fetchedPages.blogPage.sections["blog-list"];
+  const blogList = fetchedPages['blog-page'].sections["blog-list"];
 
-  useEffect(() => setFilteredBlogList(blogList), [fetchedPages]);
-
+  useEffect(() =>{ setFilteredBlogList(blogList)}, [fetchedPages]);
+  
   const populateList = () => {
     setFilteredBlogList((prev): any => {
       return [
@@ -37,36 +39,42 @@ const Template = ({ section = "" }) => {
 
   if (section !== "blog-list") return "not a blog list";
   return (
-    <div className="blog-list mb-[150px]">
-      {filteredBlogList.length ? (
-        <AccordionDemo
-          type="multiple"
-          className=""
-          itemClassName={`!border rounded-md mb-[0.5rem] overflow-hidden`}
-          triggerClassName="!rounded-none text-[16px] font-normal !no-underline p-4 hover:bg-slate-100 rounded-md"
-          items={filteredBlogList.map((blogItem: any, index: any) => {
-            return {
-              itemClassName: blogItem.slug,
-              trigger: blogItem.slug,
-              content: <BlogItem key={index} {...{ blogItem, filteredBlogList }} />,
-            };
-          })}
-        />
+    <>
+      {isPageLoading ? (
+        <BlogFormSkeleton />
       ) : (
-        <h2 className="text-3xl text-gray-300 mb-[1rem]">Empty</h2>
-      )}
+        <div className="blog-list mb-[150px]">
+          {filteredBlogList.length ? (
+            <AccordionDemo
+              type="multiple"
+              className=""
+              itemClassName={`!border rounded-md mb-[0.5rem] overflow-hidden`}
+              triggerClassName="!rounded-none text-[16px] font-normal !no-underline p-4 hover:bg-slate-100 rounded-md"
+              items={filteredBlogList.map((blogItem: any, index: any) => {
+                return {
+                  itemClassName: blogItem.slug,
+                  trigger: blogItem.slug,
+                  content: <BlogItem key={index} {...{ blogItem, filteredBlogList }} />,
+                };
+              })}
+            />
+          ) : (
+            <h2 className="text-3xl text-gray-300 mb-4">Empty</h2>
+          )}
 
-      {filteredBlogList.length === fetchedPages.blogPage.sections["blog-list"].length && (
-        <ButtonDemo
-          disabled={isLoading}
-          onClick={populateList}
-          icon={<PlusIcon />}
-          className="w-full min-h-[56px]"
-          variant="secondary"
-          text="Create New Blog"
-        />
+          {filteredBlogList.length === fetchedPages['blog-page'].sections["blog-list"].length && (
+            <ButtonDemo
+              disabled={isLoading}
+              onClick={populateList}
+              icon={<PlusIcon />}
+              className="w-full min-h-14"
+              variant="secondary"
+              text="Create New Blog"
+            />
+          )}
+        </div>
       )}
-    </div>
+    </>
   );
 };
 
@@ -77,7 +85,6 @@ type ImagesProps = {
 };
 
 type StateProps = {
-  id: string;
   slug: string;
   title: string;
   description: string;
@@ -90,7 +97,6 @@ import { initialValue } from "@/components/rich-text-editor/RichTextEditorDemo";
 
 const BlogItem = ({ blogItem = {}, filteredBlogList = [] }: any) => {
   const [state, setState] = useState<StateProps>({
-    id: "",
     slug: "",
     title: "",
     description: "",
@@ -114,15 +120,14 @@ const BlogItem = ({ blogItem = {}, filteredBlogList = [] }: any) => {
       collectionName: "website-content",
       documentId: "blog-page",
       subCollectionName: "blog",
-      subDocumentId: state.id,
+      subDocumentId: state.slug,
       setIsLoading,
       fields: {
-        id: state.id,
         slug: state.slug,
         title: state.title,
         description: state.description,
         content: state.content,
-        editorState: state.editorState,
+        editorState: JSON.stringify(state.editorState),
         images: state.images,
       },
     });
@@ -141,8 +146,9 @@ const BlogItem = ({ blogItem = {}, filteredBlogList = [] }: any) => {
           name="slug"
           type="text"
           callback={(e) => onChange(e)}
-          className="mb-5"
+          className={`cursor-not-allowed ${!blogItem.isNewBlog ? 'cursor-not-allowed':''} mb-5`}
           value={state.slug}
+          disabled={!blogItem.isNewBlog}
           //   inputClassName={true ? "is-invalid" : "is-valid"}
         />
         <InputDemo

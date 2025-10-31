@@ -15,11 +15,11 @@ export default function NotFound() {
     <div className="">
       {/* <Header className="static" /> */}
       <main className="">
-        <section className="min-h-[100vh] flex items-center">
+        <section className="min-h-screen flex items-center">
           <div className="container text-center">
-            <h1 className="text-6xl mb-[2rem] uppercase">404</h1>
+            <h1 className="text-6xl mb-8 uppercase">404</h1>
             <br />
-            <img src={notFoundImage} className="w-full max-w-[450px] mx-auto mb-[3rem]" />
+            <img src={notFoundImage} className="w-full max-w-[450px] mx-auto mb-12" />
             <ButtonDemo
               startIcon={<ChevronLeft className="-ml-3" />}
               text="Back"

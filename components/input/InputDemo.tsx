@@ -37,8 +37,8 @@ export function InputDemo({
     <div className={`field grid items-center gap-1.5 relative ${className}`}>
       {label && <Label htmlFor={id} className="w-fit text-sm font-medium">{label}</Label>}
       <Input id={id} {...props} onChange={onChange} className={`${inputClassName} ${errorMessage ? 'border-red-400': ''}`} />
-      {successMessage && <div className="valid-feedback text-green-600 text-xs mt-[-2px]">{successMessage}</div>}
-      {errorMessage && <div className="invalid-feedback text-red-600 text-xs mt-[-2px]">{errorMessage}</div>}
+      {successMessage && <div className="valid-feedback text-green-600 text-xs -mt-0.5">{successMessage}</div>}
+      {errorMessage && <div className="invalid-feedback text-red-600 text-xs -mt-0.5">{errorMessage}</div>}
     </div>
   );
 }

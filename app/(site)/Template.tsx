@@ -1,21 +1,28 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Header, Footer, LoadingScreen } from "@/components/index.js";
 import { motion } from "framer-motion";
 import { useFirebaseApiContext } from "@/context/FirebaseApiContext";
+import { SectionProps } from "@/data/websiteOriginalContent";
 
 export default function Template() {
-  const { fetchedPages } = useFirebaseApiContext();
+  const { fetchedPages, getSinglePage } = useFirebaseApiContext();
 
   const { isLoading } = fetchedPages;
+  const { header } = fetchedPages["home-page"].sections;
+
+  // useEffect(() => {
+  //     getSinglePage({ collectionName: "website-content", documentId: "home-page" });
+  // },[])
+
   return (
     <>
       {isLoading ? (
         <LoadingScreen />
       ) : (
         <main className="home-page">
-          <HeroSection />
+          <HeroSection section={header} />
           <AboutSection />
           <ServicesSection />
         </main>
@@ -24,14 +31,13 @@ export default function Template() {
   );
 }
 
-const HeroSection = () => {
+const HeroSection = ({ section }: { section: SectionProps }) => {
   const [inView, setIsInView] = useState(false);
-  const { fetchedPages } = useFirebaseApiContext();
 
-  const { title, description, images } = fetchedPages.homePage.sections.header;
+  const { title, description, images } = section;
 
   return (
-    <section className="!pt-[80px] hero text-center sm:text-left  lg:min-h-[calc(100vh-80px)] flex items-center" id="home-page">
+    <section className="pt-20! hero text-center sm:text-left  lg:min-h-[calc(100vh-80px)] flex items-center" id="home-page">
       <motion.div
         onViewportEnter={() => setIsInView(true)}
         viewport={{ amount: 0.7 }}

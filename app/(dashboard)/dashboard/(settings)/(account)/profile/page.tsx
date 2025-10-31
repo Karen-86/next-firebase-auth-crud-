@@ -73,8 +73,8 @@ export const SettingsProfile = () => {
           <div className="grid sm:grid-cols-[1fr_1fr_1fr] items-center gap-4">
             <div className="text-1xl  font-semibold">Profile</div>
             <div className="flex gap-4 items-center">
-              <div className="avatar-options avatar w-[48px]">
-                <div className="  w-[100%] h-0 pt-[100%] relative rounded-full  shadow-[0_0_6px_rgba(0,0,0,0.3)] overflow-hidden ">
+              <div className="avatar-options avatar w-12">
+                <div className="  w-full h-0 pt-[100%] relative rounded-full  shadow-[0_0_6px_rgba(0,0,0,0.3)] overflow-hidden ">
                   <img
                     src={base64PhotoURL || photoURL || avatarPlaceholderImage}
                     className="block absolute bg-gray-50 top-0 left-0 w-full h-full object-cover"
@@ -106,7 +106,7 @@ export const SettingsProfile = () => {
                           size="icon"
                           variant="ghost"
                           icon={exclamationIcon}
-                          className="w-[14px] h-[14px] [&>svg]:!w-[12px] [&>svg]:!h-[12px] text-yellow-600 border-yellow-400 border hover:text-yellow-600 rounded-full"
+                          className="w-3.5 h-3.5 [&>svg]:w-3! [&>svg]:h-3! text-yellow-600 border-yellow-400 border hover:text-yellow-600 rounded-full"
                         />
                       }
                       content={<div>This email isn’t verified. Please check your inbox to verify it.</div>}
@@ -145,7 +145,7 @@ export const SettingsProfile = () => {
                   <div className="flex items-start gap-3">
                     <ButtonDemo
                       size="sm"
-                      startIcon={<img src={googleLogoIcon} className="h-[16px]" />}
+                      startIcon={<img src={googleLogoIcon} className="h-4" />}
                       text={`${isLoading ? "Signing In..." : "Connect Google"} `}
                       className={`  text-gray-700 text-xs`}
                       disabled={!isEmailVerified || isLoading}
@@ -159,7 +159,7 @@ export const SettingsProfile = () => {
                             size="icon"
                             variant="ghost"
                             icon={exclamationIcon}
-                            className="w-[14px] h-[14px] [&>svg]:!w-[12px] [&>svg]:!h-[12px] text-yellow-600 border-yellow-400 border hover:text-yellow-600 rounded-full"
+                            className="w-3.5 h-3.5 [&>svg]:w-3! [&>svg]:h-3! text-yellow-600 border-yellow-400 border hover:text-yellow-600 rounded-full"
                           />
                         }
                         content={
@@ -183,8 +183,8 @@ export const SettingsProfile = () => {
           <div className="font-semibold">Providers:</div>
           <div className="capitalize font-medium">
             <div className="">
-              {isGoogleSignInMethodEnabled && <div className="[&>svg]:w-[20px] [&>svg]:h-[20px]">{googleIcon}</div>}
-              {isEmailPasswordMethodEnabled && <div className="[&>svg]:w-[20px] [&>svg]:h-[20px]">{emailIcon}</div>}
+              {isGoogleSignInMethodEnabled && <div className="[&>svg]:w-5 [&>svg]:h-5">{googleIcon}</div>}
+              {isEmailPasswordMethodEnabled && <div className="[&>svg]:w-5 [&>svg]:h-5">{emailIcon}</div>}
             </div>
           </div>
         </div>

@@ -74,6 +74,9 @@ type FirebaseApiContextType = {
 
   // createContent: ({ id, slug, setIsLoading, ...fields }: { [key: string]: any }) => void;
   // updateContent: ({ id, slug, setIsLoading, ...fields }: { [key: string]: any }) => void;
+  getAllSubPages: ({ id, slug, setIsLoading, ...fields }: { [key: string]: any }) => void;
+  getSinglePage: ({ id, slug, setIsLoading, ...fields }: { [key: string]: any }) => void;
+  getSingleSubPage: ({ id, slug, setIsLoading, ...fields }: { [key: string]: any }) => void;
   updateContent: ({ id, slug, setIsLoading, ...fields }: { [key: string]: any }) => void;
   updateContentSubCollection: ({ userId, collectionName, collectionId, setIsLoading }: { [key: string]: any }) => void;
 };
@@ -173,8 +176,8 @@ export default function FirebaseApiProvider({
   const updateUser = async ({ id = "", updatedFields = {}, setIsLoading = (_: boolean) => {}, callback = () => {} }) => {
     setIsLoading(true);
     try {
-      const userDoc = doc(db, "users", id);
-      await updateDoc(userDoc, { ...updatedFields, updatedAt: serverTimestamp() });
+      const docRef = doc(db, "users", id);
+      await updateDoc(docRef, { ...updatedFields, updatedAt: serverTimestamp() });
       getUsers({});
       successAlert("User information has been updated successfully.");
     } catch (err: any) {
@@ -196,8 +199,8 @@ export default function FirebaseApiProvider({
     setIsLoading(true);
 
     try {
-      const docRef = doc(db, "users", userId, collectionName, collectionId);
-      const docSnap = await getDoc(docRef);
+      const subDocRef = doc(db, "users", userId, collectionName, collectionId);
+      const docSnap = await getDoc(subDocRef);
 
       const dataToSave: any = {
         ...updatedFields,
@@ -205,7 +208,7 @@ export default function FirebaseApiProvider({
       };
 
       if (!docSnap.exists()) dataToSave.createdAt = serverTimestamp();
-      await setDoc(docRef, dataToSave, { merge: true }); //recommended option, if subCollection dont exist it will create, if exist it will update, also you control id name
+      await setDoc(subDocRef, dataToSave, { merge: true }); //recommended option, if subCollection dont exist it will create, if exist it will update, also you control id name
 
       // await addDoc(collection(db, "users", userId, "gallery"), {
       //   updatedFields,
@@ -260,37 +263,133 @@ export default function FirebaseApiProvider({
   };
 
   // WEBSITECONTENT
-  const getContents = async ({ setIsLoading = (_: boolean) => {} }) => {
+  // const getContents = async ({ setIsLoading = (_: boolean) => {} }) => {
+  //   setIsLoading(true);
+  //   setFetchedPages((prev) => ({ ...prev, isLoading: true }));
+  //   try {
+  //     const websiteContentRef = collection(db, "website-content");
+  //     const blogSubColRef = collection(db, "website-content", "blog-page", "blog");
+
+  //     const [res, res2] = await Promise.all([getDocs(websiteContentRef), getDocs(blogSubColRef)]);
+
+  //     const pages = res.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+  //     const blog = res2.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+  //     const blogList = blog.map((item: any) => ({ ...item.blog }));
+
+  //     // if (pages && pages.length) {
+  //     setFetchedPages((prev: any) => ({
+  //       ...prev,
+  //       homePage: {
+  //         sections: { ...prev.homePage.sections, ...pages.find((item) => item.id === "home-page") },
+  //       },
+  //       blogPage: {
+  //         sections: { ...prev.blogPage.sections, ...pages.find((item) => item.id === "blog-page"), "blog-list": blogList },
+  //       },
+  //     }));
+  //     // }
+  //   } catch (err: any) {
+  //     if (err.message == "Missing or insufficient permissions.") {
+  //       console.warn(err, "=getContents= request warning");
+  //       return;
+  //     }
+  //     errorAlert(err.message || "Internal server error. Please try again later.");
+  //     console.error(err, "=getContents= request error");
+  //   } finally {
+  //     setIsLoading(false);
+  //     setFetchedPages((prev) => ({ ...prev, isLoading: false }));
+  //   }
+  // };
+
+  const getSinglePage = async ({ collectionName = "", documentId = "", setIsLoading = (_: boolean) => {} }) => {
     setIsLoading(true);
     setFetchedPages((prev) => ({ ...prev, isLoading: true }));
     try {
-      const websiteContentRef = collection(db, "website-content");
-      const blogSubColRef = collection(db, "website-content", "blog-page", "blog");
+      const docRef = doc(db, collectionName, documentId);
+      const res = await getDoc(docRef);
+      const data = { id: res.id, ...res.data() };
 
-      const [res, res2] = await Promise.all([getDocs(websiteContentRef), getDocs(blogSubColRef)]);
+      if (!res.exists()) throw new Error("Content not found");
 
-      const pages = res.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
-      const blog = res2.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
-      const blogList = blog.map((item: any) => ({ ...item.blog }));
-
-      // if (pages && pages.length) {
+      console.log(data);
       setFetchedPages((prev: any) => ({
         ...prev,
-        homePage: {
-          sections: { ...prev.homePage.sections, ...pages.find((item) => item.id === "home-page") },
-        },
-        blogPage: {
-          sections: { ...prev.blogPage.sections, ...pages.find((item) => item.id === "blog-page"), "blog-list": blogList },
-        },
+        [documentId]: { sections: { ...prev[documentId].sections, ...data } },
       }));
-      // }
     } catch (err: any) {
-      if (err.message == "Missing or insufficient permissions.") {
-        console.warn(err, "=getContents= request warning");
+      if (err.message == "Content not found") {
+        console.warn(err, "=getContent= request warning");
         return;
       }
       errorAlert(err.message || "Internal server error. Please try again later.");
-      console.error(err, "=getContents= request error");
+      console.error(err, "=getContent= request error");
+    } finally {
+      setIsLoading(false);
+      setFetchedPages((prev) => ({ ...prev, isLoading: false }));
+    }
+  };
+
+  const getAllSubPages = async ({
+    collectionName = "",
+    documentId = "",
+    subCollectionName = "",
+    setIsLoading = (_: boolean) => {},
+  }) => {
+    setIsLoading(true);
+    setFetchedPages((prev) => ({ ...prev, isLoading: true }));
+    try {
+      const subCollectionRef = collection(db, collectionName, documentId, subCollectionName);
+      const res = await getDocs(subCollectionRef);
+      const data = res.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+
+      setFetchedPages((prev: any) => ({
+        ...prev,
+        [documentId]: {
+          sections: { ...prev[documentId].sections, "blog-list": [...data.map((item: any) => ({ ...item.blog }))] },
+        },
+      }));
+    } catch (err: any) {
+      if (err.message == "Missing or insufficient permissions.") {
+        console.warn(err, "=getContent= request warning");
+        return;
+      }
+      errorAlert(err.message || "Internal server error. Please try again later.");
+      console.error(err, "=getContent= request error");
+    } finally {
+      setIsLoading(false);
+      setFetchedPages((prev) => ({ ...prev, isLoading: false }));
+    }
+  };
+
+  const getSingleSubPage = async ({
+    collectionName = "",
+    documentId = "",
+    subCollectionName = "",
+    subDocumentId = "",
+    setIsLoading = (_: boolean) => {},
+  }) => {
+    setIsLoading(true);
+    setFetchedPages((prev) => ({ ...prev, isLoading: true }));
+    try {
+      const subDocRef = doc(db, collectionName, documentId, subCollectionName, subDocumentId);
+      const res = await getDoc(subDocRef);
+      const data: any = { id: res.id, ...res.data() };
+      console.log(data);
+
+      if (!res.exists()) throw new Error("Content not found");
+
+      setFetchedPages((prev: any) => ({
+        ...prev,
+        [documentId]: {
+          sections: { ...prev[documentId].sections, "blog-item": data.blog },
+        },
+      }));
+    } catch (err: any) {
+      if (err.message == "Content not found") {
+        console.warn(err, "=getSingleSubPage= request warning");
+        return;
+      }
+      errorAlert(err.message || "Internal server error. Please try again later.");
+      console.error(err, "=getSingleSubPage= request error");
     } finally {
       setIsLoading(false);
       setFetchedPages((prev) => ({ ...prev, isLoading: false }));
@@ -367,7 +466,7 @@ export default function FirebaseApiProvider({
       if (!docSnap.exists()) filteredData.createdAt = serverTimestamp();
       await setDoc(docRef, filteredData, { merge: true }); //recommended option, if subCollection dont exist it will create, if exist it will update, also you control id name
 
-      getContents({});
+      getSinglePage({ collectionName: "website-content", documentId: "home-page" });
       successAlert("Content has been updated successfully.");
     } catch (err: any) {
       errorAlert(err.message || "Internal server error. Please try again later.");
@@ -390,8 +489,8 @@ export default function FirebaseApiProvider({
     setIsLoading(true);
 
     try {
-      const docRef = doc(db, collectionName, documentId, subCollectionName, subDocumentId);
-      const docSnap = await getDoc(docRef);
+      const subDocRef = doc(db, collectionName, documentId, subCollectionName, subDocumentId);
+      const docSnap = await getDoc(subDocRef);
 
       const filteredData: any = {
         blog: fields,
@@ -399,8 +498,9 @@ export default function FirebaseApiProvider({
       };
 
       if (!docSnap.exists()) filteredData.createdAt = serverTimestamp();
-      await setDoc(docRef, filteredData, { merge: true }); //recommended option, if subCollection dont exist it will create, if exist it will update, also you control id name
-      getContents({});
+      await setDoc(subDocRef, filteredData, { merge: true }); //recommended option, if subCollection dont exist it will create, if exist it will update, also you control id name
+
+      getAllSubPages({ collectionName: "website-content", documentId: "blog-page", subCollectionName: "blog" });
       successAlert("Content has been updated successfully.");
     } catch (err: any) {
       errorAlert(err.message || "Internal server error. Please try again later.");
@@ -417,7 +517,9 @@ export default function FirebaseApiProvider({
   }, [currentUser, state.isDBUserCreated]);
 
   useEffect(() => {
-    getContents({});
+    getSinglePage({ collectionName: "website-content", documentId: "home-page" });
+    getAllSubPages({ collectionName: "website-content", documentId: "blog-page", subCollectionName: "blog" });
+
   }, []);
 
   return (
@@ -440,6 +542,9 @@ export default function FirebaseApiProvider({
 
         // createContent,
         // updateContent,
+        getSinglePage,
+        getSingleSubPage,
+        getAllSubPages,
         updateContent,
         updateContentSubCollection,
       }}

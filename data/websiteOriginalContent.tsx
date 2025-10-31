@@ -2,9 +2,32 @@ import localData from "@/localData";
 
 const { placeholderImage } = localData.images;
 
-const websiteContent = {
+type ImageProps = {
+  id: string;
+  title: string;
+  url: string;
+};
+
+export type SectionProps = {
+  title: string;
+  description: string;
+  images: ImageProps[];
+};
+
+type PageSectionsProps = {
+  [sectionName: string]: SectionProps | any[] | any; // supports sections or arrays like 'blog-list'
+};
+
+export type pagesProps = {
+  isLoading: boolean;
+  [pageName: string]: {
+    sections: PageSectionsProps;
+  } | boolean;
+};
+
+const websiteContent: pagesProps = {
   isLoading: false,
-  homePage: {
+  'home-page': {
     sections: {
       header: {
         title: "Header",
@@ -19,7 +42,7 @@ const websiteContent = {
       },
     },
   },
-  blogPage: {
+  'blog-page': {
     sections: {
       header: {
         title: "Header",
@@ -27,6 +50,7 @@ const websiteContent = {
         images: [{ id: "1", title: "", url: placeholderImage }],
       },
       "blog-list": [],
+      "blog-item": {}
     },
   },
 };

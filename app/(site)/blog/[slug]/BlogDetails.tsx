@@ -1,7 +1,7 @@
 "use client";
 // import "@/components/blocks/editor-x/editor.css";
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { BlogCard, LoadingScreen, BreadcrumbDemo, ButtonDemo } from "@/components/index.js";
 import { useFirebaseApiContext } from "@/context/FirebaseApiContext";
 import Link from "next/link";
@@ -11,10 +11,7 @@ import Image from "next/image";
 
 const { preloaderImage, placeholderImage } = localData.images;
 
-export default function BlogDetails({ slug = "" }) {
-  const { fetchedPages } = useFirebaseApiContext();
-
-  const details = fetchedPages.blogPage.sections["blog-list"].find((item: any) => item.slug == slug);
+export default function BlogDetails({ details = "" }: any) {
 
   const breadcrumbItems = [
     {
@@ -25,6 +22,8 @@ export default function BlogDetails({ slug = "" }) {
       label: `${details?.title}`,
     },
   ];
+
+  if (!Object.keys(details).length) return "";
 
   return (
     <main className="blog-page ">
@@ -40,11 +39,8 @@ export default function BlogDetails({ slug = "" }) {
   );
 }
 
-
-const HeroSection = ({ id = "", image = "", title = "", description = "", content = "" }) => {
-  console.log(title, "[[[[[[[[[[[[[[[[[[[[[[[[");
+const HeroSection = ({ image = "", title = "", description = "", content = "" }) => {
   const [src, setSrc] = useState(preloaderImage);
-
   useEffect(() => {
     if (!image) return;
     const img = new window.Image() as HTMLImageElement;
@@ -54,18 +50,20 @@ const HeroSection = ({ id = "", image = "", title = "", description = "", conten
   }, [image]);
 
   return (
-    <section className="hero !p-0" id="blog-details-page">
-      {!id ? (
-        "Empty"
-      ) : (
-        <div className="hero-content">
-          <div className="relative pt-[56.25%]">
-            <Image src={src} alt={title} fill />
-          </div>
+    <section className="hero p-0!" id="blog-details-page">
+      <article className="hero-content">
+        <div className="relative pt-[56.25%]">
+          <Image src={src} alt={title} fill />
+        </div>
+        <br />
+        {title && <h1 className="text-3xl mb-4">{title}</h1>}
+        {description && <p className="text-xl text-gray-500">{description}</p>}
+        <br />
+        <br />
 
-          <div className="prose prose-neutral max-w-none" dangerouslySetInnerHTML={{ __html: content }}></div>
+        <div className="" dangerouslySetInnerHTML={{ __html: content }}></div>
 
-          {/* <div className="col-md-9">
+        {/* <div className="col-md-9">
             <img src="/system/ckfinder/userfiles/files/Blog%20Images/Blog%20Images%202/Can%20I%20Sell%20My%20Holiday%20Package.jpg" />
             <div></div>
             <h2 className="purple latoBold">Can I Sell My Package Holiday?</h2>
@@ -439,8 +437,7 @@ const HeroSection = ({ id = "", image = "", title = "", description = "", conten
               </div>
             </div>
           </div> */}
-        </div>
-      )}
+      </article>
     </section>
   );
 };
