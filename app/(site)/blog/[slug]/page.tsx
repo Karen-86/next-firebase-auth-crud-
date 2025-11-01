@@ -4,7 +4,7 @@ import { fetchBlog } from "@/lib/fetchers/blogs";
 import { Blog } from "@/types/index";
 
 // export const revalidate = 600; // 10min
-// export const dynamic = "force-dynamic";
+export const dynamic = "force-dynamic";
 
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://next-modules.vercel.app";
 
