@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect, createContext, useContext } from "react";
-import { db, auth } from "@/config/firebase";
+import { auth, db } from "@/lib/firebase/config/firebase";
 import {
   collection,
   setDoc,
@@ -18,10 +18,7 @@ import {
 } from "firebase/firestore";
 import useAlert from "@/hooks/useAlert";
 import { useFirebaseAuthContext } from "./FirebaseAuthContext";
-import localData from "@/localData";
-import websiteOriginalContent from "@/data/websiteOriginalContent";
-
-const { placeholderImage } = localData.images;
+import websiteOriginalContent from "@/lib/data/websiteOriginalContent";
 
 type FetchedEventsProps = {
   isLoading: boolean;
@@ -74,11 +71,12 @@ type FirebaseApiContextType = {
 
   // createContent: ({ id, slug, setIsLoading, ...fields }: { [key: string]: any }) => void;
   // updateContent: ({ id, slug, setIsLoading, ...fields }: { [key: string]: any }) => void;
+  // getSingleSubPage: ({ id, slug, setIsLoading, ...fields }: { [key: string]: any }) => void;
   getAllSubPages: ({ id, slug, setIsLoading, ...fields }: { [key: string]: any }) => void;
   getSinglePage: ({ id, slug, setIsLoading, ...fields }: { [key: string]: any }) => void;
-  getSingleSubPage: ({ id, slug, setIsLoading, ...fields }: { [key: string]: any }) => void;
   updateContent: ({ id, slug, setIsLoading, ...fields }: { [key: string]: any }) => void;
   updateContentSubCollection: ({ userId, collectionName, collectionId, setIsLoading }: { [key: string]: any }) => void;
+  deleteContentSubCollection: ({ userId, collectionName, collectionId, setIsLoading }: { [key: string]: any }) => void;
 };
 
 export const FirebaseApiContext = createContext<FirebaseApiContextType | null>(null);
@@ -360,41 +358,41 @@ export default function FirebaseApiProvider({
     }
   };
 
-  const getSingleSubPage = async ({
-    collectionName = "",
-    documentId = "",
-    subCollectionName = "",
-    subDocumentId = "",
-    setIsLoading = (_: boolean) => {},
-  }) => {
-    setIsLoading(true);
-    setFetchedPages((prev) => ({ ...prev, isLoading: true }));
-    try {
-      const subDocRef = doc(db, collectionName, documentId, subCollectionName, subDocumentId);
-      const res = await getDoc(subDocRef);
-      const data: any = { id: res.id, ...res.data() };
-      console.log(data);
+  // const getSingleSubPage = async ({
+  //   collectionName = "",
+  //   documentId = "",
+  //   subCollectionName = "",
+  //   subDocumentId = "",
+  //   setIsLoading = (_: boolean) => {},
+  // }) => {
+  //   setIsLoading(true);
+  //   setFetchedPages((prev) => ({ ...prev, isLoading: true }));
+  //   try {
+  //     const subDocRef = doc(db, collectionName, documentId, subCollectionName, subDocumentId);
+  //     const res = await getDoc(subDocRef);
+  //     const data: any = { id: res.id, ...res.data() };
+  //     console.log(data);
 
-      if (!res.exists()) throw new Error("Content not found");
+  //     if (!res.exists()) throw new Error("Content not found");
 
-      setFetchedPages((prev: any) => ({
-        ...prev,
-        [documentId]: {
-          sections: { ...prev[documentId].sections, "blog-item": data.blog },
-        },
-      }));
-    } catch (err: any) {
-      if (err.message == "Content not found") {
-        console.warn(err, "=getSingleSubPage= request warning");
-        return;
-      }
-      errorAlert(err.message || "Internal server error. Please try again later.");
-      console.error(err, "=getSingleSubPage= request error");
-    } finally {
-      setIsLoading(false);
-      setFetchedPages((prev) => ({ ...prev, isLoading: false }));
-    }
-  };
+  //     setFetchedPages((prev: any) => ({
+  //       ...prev,
+  //       [documentId]: {
+  //         sections: { ...prev[documentId].sections, "blog-item": data.blog },
+  //       },
+  //     }));
+  //   } catch (err: any) {
+  //     if (err.message == "Content not found") {
+  //       console.warn(err, "=getSingleSubPage= request warning");
+  //       return;
+  //     }
+  //     errorAlert(err.message || "Internal server error. Please try again later.");
+  //     console.error(err, "=getSingleSubPage= request error");
+  //   } finally {
+  //     setIsLoading(false);
+  //     setFetchedPages((prev) => ({ ...prev, isLoading: false }));
+  //   }
+  // };
 
   // const createContent = async ({ slug = "", setIsLoading = (_: boolean) => {}, ...fields }) => {
   //   setIsLoading(true);
@@ -509,6 +507,31 @@ export default function FirebaseApiProvider({
     setIsLoading(false);
     callback();
   };
+  const deleteContentSubCollection = async ({
+    collectionName = "",
+    documentId = "",
+    subCollectionName = "",
+    subDocumentId = "",
+    setIsLoading = (_: boolean) => {},
+    callback = () => {},
+  }) => {
+    setIsLoading(true);
+
+    try {
+      const subDocRef = doc(db, collectionName, documentId, subCollectionName, subDocumentId);
+      const docSnap = await getDoc(subDocRef);
+      if (!docSnap.exists()) throw new Error("Blog not found.");
+      
+      await deleteDoc(subDocRef);
+      getAllSubPages({ collectionName: "website-content", documentId: "blog-page", subCollectionName: "blog" });
+      successAlert("Content has been deleted successfully.");
+    } catch (err: any) {
+      errorAlert(err.message || "Internal server error. Please try again later.");
+      console.error(err, "=deleteContentSubCollection= request error");
+    }
+    setIsLoading(false);
+    callback();
+  };
 
   useEffect(() => {
     if (!currentUser?.uid) return;
@@ -519,7 +542,6 @@ export default function FirebaseApiProvider({
   useEffect(() => {
     getSinglePage({ collectionName: "website-content", documentId: "home-page" });
     getAllSubPages({ collectionName: "website-content", documentId: "blog-page", subCollectionName: "blog" });
-
   }, []);
 
   return (
@@ -542,11 +564,12 @@ export default function FirebaseApiProvider({
 
         // createContent,
         // updateContent,
+        // getSingleSubPage,
         getSinglePage,
-        getSingleSubPage,
         getAllSubPages,
         updateContent,
         updateContentSubCollection,
+        deleteContentSubCollection,
       }}
     >
       {children}

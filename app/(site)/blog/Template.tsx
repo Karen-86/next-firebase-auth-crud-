@@ -3,12 +3,9 @@
 import React, { useEffect, useState } from "react";
 import { BlogCard, LoadingScreen } from "@/components/index.js";
 import { useFirebaseApiContext } from "@/context/FirebaseApiContext";
+import { Blog } from "@/types/index";
 
-export default function Template() {
-  const { fetchedPages, getAllSubPages, getSinglePage } = useFirebaseApiContext();
-  const { isLoading } = fetchedPages;
-  const blogList = fetchedPages["blog-page"].sections["blog-list"];
-
+export default function Template({ blogList }: { blogList: Blog[] }) {
   return (
     <main className="blog-page">
       <HeroSection blogList={blogList} />
@@ -16,7 +13,7 @@ export default function Template() {
   );
 }
 
-const HeroSection = ({ blogList = [] }: any) => {
+const HeroSection = ({ blogList }: { blogList: Blog[] }) => {
   return (
     <section className="hero p-0!" id="blog-page">
       <h2 className="text-1xl mb-8 font-medium! uppercase w-fit mx-auto">
@@ -26,7 +23,9 @@ const HeroSection = ({ blogList = [] }: any) => {
       <div className="blog-list grid md:grid-cols-[repeat(auto-fill,minmax(250px,1fr))] gap-5">
         {blogList.length ? (
           blogList.map((blogItem: any, index: any) => {
-            return <BlogCard key={index} {...{ ...blogItem, image: blogItem.images[0].url }} />;
+            return (
+              <BlogCard key={index} {...{ ...blogItem, description: blogItem.shortDescription, image: blogItem.images[0].url }} />
+            );
           })
         ) : (
           <h2 className="text-3xl text-gray-300">Empty</h2>

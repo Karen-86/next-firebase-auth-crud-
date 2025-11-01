@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import { signOut } from "firebase/auth";
-import { auth } from "@/config/firebase";
+import { auth } from "@/lib/firebase/config/firebase";
 
 const useAutoLogout = (autoLogoutTime = 24 * 7 * 60 * 60 * 1000) => {
   const handleSignOut = async () => {

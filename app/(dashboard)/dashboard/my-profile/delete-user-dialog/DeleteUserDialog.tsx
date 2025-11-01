@@ -2,8 +2,6 @@
 
 import React, { useState, useEffect } from "react";
 import { ButtonDemo, DialogDemo, InputDemo } from "@/components/index";
-// import { useDeleteAccount } from "@/hooks/useDeleteAccount";
-import { useDeleteUser } from "@/hooks/useDeleteUser";
 import { useFirebaseAuthContext } from "@/context/FirebaseAuthContext";
 
 export const DeleteUserDialog = ({ id = "" }) => {
@@ -22,20 +20,12 @@ export const DeleteUserDialog = ({ id = "" }) => {
 const DeleteUserDialogContent = ({ id = "", closeDialog = () => {} }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [confirmationText, setConfirmationText] = useState("");
-  // const { deleteAccount } = useDeleteAccount();
 
-  const { currentUser } = useFirebaseAuthContext();
-
-  // const handleFullUserDelete = () => {
-  //   // handleDeleteUser({ id: id, password, setIsLoading });
-  //   deleteAccount({ setIsLoading });
-  // };
-
-  const { deleteUser} = useDeleteUser();
+  const { currentUser , handleDeleteUser} = useFirebaseAuthContext();
 
   return (
     <div className="delete-user-dialog">
-      <h2 className="text-2xl !font-semibold mb-5">Delete account</h2>
+      <h2 className="text-2xl font-semibold! mb-5">Delete account</h2>
       <p className="text-sm text-gray-500 mb-6 leading-[1.6]">
         Are you sure you want to delete your account? This will permanently remove your account and all related data.{" "}
         <span className="text-red-400">This action cannot be undone.</span>
@@ -70,7 +60,7 @@ const DeleteUserDialogContent = ({ id = "", closeDialog = () => {} }) => {
           // disabled={!password || isLoading}
           disabled={confirmationText !== "Delete account" || isLoading}
           onClick={() => {
-            if (currentUser) deleteUser({uid:currentUser.uid,setIsLoading});
+            if (currentUser) handleDeleteUser({uid:currentUser.uid,setIsLoading});
           }}
         />
       </div>

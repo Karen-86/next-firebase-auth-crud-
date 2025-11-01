@@ -1,24 +1,24 @@
 "use server";
-import { admin } from "@/lib/firebaseAdmin";
+import { admin } from "@/lib/firebase/firebaseAdmin";
 import { getFirestore } from "firebase-admin/firestore";
 
 const db = getFirestore();
 
-export const deleteUserAction = async (idToken: string, uid: string) => {
+export const deleteUser = async (idToken: string, uid: string) => {
   try {
-    // 1️⃣ Verify ID token
+    // 1️ Verify ID token
     const decoded = await admin.auth().verifyIdToken(idToken);
     const requesterUid = decoded.uid;
 
-    // 2️⃣ Get requester's role from Firestore
+    // 2️ Get requester's role from Firestore
     const requesterDoc = await db.collection("users").doc(requesterUid).get();
     const requesterRole = requesterDoc.exists ? requesterDoc.data()?.role : null;
 
-    // 3️⃣ Get target user's role
+    // 3️ Get target user's role
     const targetDoc = await db.collection("users").doc(uid).get();
     const targetRole = targetDoc.exists ? targetDoc.data()?.role : null;
 
-    // 4️⃣ Determine permissions
+    // 4️ Determine permissions
     const isSelf = requesterUid === uid;
     const canDelete =
       isSelf || // user can delete own account
@@ -29,10 +29,10 @@ export const deleteUserAction = async (idToken: string, uid: string) => {
       return { success: false, error: "Unauthorized attempt" };
     }
 
-    // 5️⃣ Delete Auth user
+    // 5️ Delete Auth user
     await admin.auth().deleteUser(uid);
 
-    // 6️⃣ Delete Firestore user document
+    // 6️ Delete Firestore user document
     //   await db.collection("users").doc(uid).delete();
     await deleteDocumentRecursively(db.collection("users").doc(uid));
 

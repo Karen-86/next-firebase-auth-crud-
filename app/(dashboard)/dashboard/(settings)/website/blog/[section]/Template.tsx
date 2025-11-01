@@ -6,20 +6,22 @@ import { useFirebaseApiContext } from "@/context/FirebaseApiContext";
 import { PlusIcon } from "lucide-react";
 import localData from "@/localData";
 import { v4 as uuidv4 } from "uuid";
+import DeleteBlogDialog from "./delete-blog-dialog/DeleteBlogDialog";
 
 const { placeholderImage } = localData.images;
 
 const Template = ({ section = "" }) => {
   const { fetchedPages } = useFirebaseApiContext();
-  const { isLoading: isPageLoading } = fetchedPages;
   const { isLoading } = fetchedPages;
 
-  console.log(fetchedPages)
+  console.log(fetchedPages);
   const [filteredBlogList, setFilteredBlogList] = useState([]);
-  const blogList = fetchedPages['blog-page'].sections["blog-list"];
+  const blogList = fetchedPages["blog-page"].sections["blog-list"];
 
-  useEffect(() =>{ setFilteredBlogList(blogList)}, [fetchedPages]);
-  
+  useEffect(() => {
+    setFilteredBlogList(blogList);
+  }, [fetchedPages]);
+
   const populateList = () => {
     setFilteredBlogList((prev): any => {
       return [
@@ -40,7 +42,7 @@ const Template = ({ section = "" }) => {
   if (section !== "blog-list") return "not a blog list";
   return (
     <>
-      {isPageLoading ? (
+      {isLoading ? (
         <BlogFormSkeleton />
       ) : (
         <div className="blog-list mb-[150px]">
@@ -62,7 +64,7 @@ const Template = ({ section = "" }) => {
             <h2 className="text-3xl text-gray-300 mb-4">Empty</h2>
           )}
 
-          {filteredBlogList.length === fetchedPages['blog-page'].sections["blog-list"].length && (
+          {filteredBlogList.length === fetchedPages["blog-page"].sections["blog-list"].length && (
             <ButtonDemo
               disabled={isLoading}
               onClick={populateList}
@@ -86,7 +88,10 @@ type ImagesProps = {
 
 type StateProps = {
   slug: string;
+  seoTitle: string;
+  seoDescription: string;
   title: string;
+  shortDescription: string;
   description: string;
   content: string;
   editorState: any;
@@ -98,14 +103,17 @@ import { initialValue } from "@/components/rich-text-editor/RichTextEditorDemo";
 const BlogItem = ({ blogItem = {}, filteredBlogList = [] }: any) => {
   const [state, setState] = useState<StateProps>({
     slug: "",
+    seoTitle: "",
+    seoDescription: "",
     title: "",
+    shortDescription: "",
     description: "",
     content: "",
     editorState: null,
     images: [],
   });
   const [isLoading, setIsLoading] = useState(false);
-  const { fetchedPages, updateContentSubCollection } = useFirebaseApiContext();
+  const { updateContentSubCollection } = useFirebaseApiContext();
 
   const onChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setState((prev) => ({
@@ -124,7 +132,10 @@ const BlogItem = ({ blogItem = {}, filteredBlogList = [] }: any) => {
       setIsLoading,
       fields: {
         slug: state.slug,
+        seoTitle: state.seoTitle,
+        seoDescription: state.seoDescription,
         title: state.title,
+        shortDescription: state.shortDescription,
         description: state.description,
         content: state.content,
         editorState: JSON.stringify(state.editorState),
@@ -135,25 +146,46 @@ const BlogItem = ({ blogItem = {}, filteredBlogList = [] }: any) => {
 
   useEffect(() => {
     const tempState = { ...blogItem, editorState: (blogItem.editorState && JSON.parse(blogItem.editorState)) || initialValue };
-    setState(tempState);
+    setState((prev) => ({ ...prev, ...tempState }));
   }, [blogItem]);
 
   return (
     <div className="p-4">
-      <form action="" onSubmit={onSubmit}>
+      <form action="" onSubmit={onSubmit} className="">
         <InputDemo
           label="Slug"
           name="slug"
           type="text"
           callback={(e) => onChange(e)}
-          className={`cursor-not-allowed ${!blogItem.isNewBlog ? 'cursor-not-allowed':''} mb-5`}
+          className={`cursor-not-allowed ${!blogItem.isNewBlog ? "cursor-not-allowed" : ""} mb-5`}
           value={state.slug}
           disabled={!blogItem.isNewBlog}
           //   inputClassName={true ? "is-invalid" : "is-valid"}
         />
         <InputDemo
+          label="SEO Title"
+          name="seoTitle"
+          placeholder="Shown in search engines and browser tabs (50–60 chars)"
+          type="text"
+          callback={(e) => onChange(e)}
+          className={` mb-5`}
+          value={state.seoTitle}
+          //   inputClassName={true ? "is-invalid" : "is-valid"}
+        />
+        <InputDemo
+          label="SEO Description"
+          name="seoDescription"
+          placeholder="Meta description for SEO and social previews (140–160 chars)"
+          type="text"
+          callback={(e) => onChange(e)}
+          className={` mb-5`}
+          value={state.seoDescription}
+          //   inputClassName={true ? "is-invalid" : "is-valid"}
+        />
+        <InputDemo
           label="Title"
           name="title"
+          placeholder="Enter the blog title"
           type="text"
           callback={(e) => onChange(e)}
           className="mb-5"
@@ -161,8 +193,19 @@ const BlogItem = ({ blogItem = {}, filteredBlogList = [] }: any) => {
           //   inputClassName={true ? "is-invalid" : "is-valid"}
         />
         <InputDemo
+          label="Short Description"
+          name="shortDescription"
+          placeholder="A brief summary (1–2 sentences)"
+          type="text"
+          callback={(e) => onChange(e)}
+          className="mb-5"
+          value={state.shortDescription}
+          //   inputClassName={true ? "is-invalid" : "is-valid"}
+        />
+        <InputDemo
           label="Description"
           name="description"
+          placeholder="Detailed description or excerpt"
           type="text"
           callback={(e) => onChange(e)}
           className="mb-5"
@@ -190,6 +233,7 @@ const BlogItem = ({ blogItem = {}, filteredBlogList = [] }: any) => {
           }
         />
       </form>
+      {!blogItem.isNewBlog && <DeleteBlogDialog id={state.slug} />}
     </div>
   );
 };

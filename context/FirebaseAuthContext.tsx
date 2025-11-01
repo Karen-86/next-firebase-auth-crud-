@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect, createContext, useContext } from "react";
-import { auth, db } from "@/config/firebase";
+import { auth, db } from "@/lib/firebase/config/firebase";
 import { doc, setDoc, getDoc, deleteDoc, serverTimestamp } from "firebase/firestore";
 import { User } from "firebase/auth";
 import { useRouter } from "next/navigation";
@@ -24,6 +24,7 @@ import {
 } from "firebase/auth";
 import useAutoLogout from "@/hooks/useAutoLogout";
 import useAlert from "@/hooks/useAlert";
+import * as userActions from '@/lib/actions/users'
 
 type StateType = {
   [key: string]: any;
@@ -150,30 +151,52 @@ export default function FirebaseAuthProvider({
     setIsLoading(false);
   };
 
-  const handleDeleteUser = async ({ id = "", password = "", setIsLoading = (_: boolean) => {}, callback = () => {} }) => {
+  // const handleDeleteUser = async ({ id = "", password = "", setIsLoading = (_: boolean) => {}, callback = () => {} }) => {
+  //   setIsLoading(true);
+  //   try {
+  //     if (!currentUser || !currentUser.email) return errorAlert("Current User is undefined");
+
+  //     const credential = EmailAuthProvider.credential(currentUser.email, password);
+  //     await reauthenticateWithCredential(currentUser, credential);
+
+  //     const userDoc = doc(db, "users", id);
+  //     await deleteDoc(userDoc);
+
+  //     await currentUser.delete();
+
+  //     successAlert("User has been deleted successfully.");
+  //     callback();
+  //   } catch (err: any) {
+  //     if (err.code === "auth/requires-recent-login") {
+  //       errorAlert("For security reasons, please sign in again before deleting your account.");
+  //     } else {
+  //       errorAlert(err.message || "Internal server error. Please try again later.");
+  //     }
+  //     console.error(err, "=handleDeleteUser= request error");
+  //   }
+  //   setIsLoading(false);
+  // };
+
+  const handleDeleteUser = async ({ uid = "", setIsLoading = (_: boolean) => {}, callback = () => {} }) => {
     setIsLoading(true);
+
     try {
-      if (!currentUser || !currentUser.email) return errorAlert("Current User is undefined");
+      const user = auth.currentUser;
+      const idToken = await user?.getIdToken();
+      if (!idToken) throw new Error("User not authenticated.");
 
-      const credential = EmailAuthProvider.credential(currentUser.email, password);
-      await reauthenticateWithCredential(currentUser, credential);
+      const result = await userActions.deleteUser(idToken, uid);
+      if (!result.success) throw new Error(result.error || "Failed to delete user.");
 
-      const userDoc = doc(db, "users", id);
-      await deleteDoc(userDoc);
-
-      await currentUser.delete();
-
-      successAlert("User has been deleted successfully.");
+      successAlert("Account deleted successfully");
       callback();
+      if (uid === auth.currentUser?.uid) await auth.signOut();
     } catch (err: any) {
-      if (err.code === "auth/requires-recent-login") {
-        errorAlert("For security reasons, please sign in again before deleting your account.");
-      } else {
-        errorAlert(err.message || "Internal server error. Please try again later.");
-      }
-      console.error(err, "=handleDeleteUser= request error");
+      errorAlert(err.message || "Failed to delete account");
+      console.error(err.message || "Failed to delete account");
+    } finally {
+      setIsLoading(false);
     }
-    setIsLoading(false);
   };
 
   const handleSignOut = async ({ setIsLoading = (_: boolean) => {}, callback = () => {} }) => {

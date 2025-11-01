@@ -12,7 +12,7 @@ type ButtonDemoProps = React.ButtonHTMLAttributes<HTMLButtonElement> & {
   startIcon?: ReactElement | null;
   endIcon?: ReactElement | null;
   disabled?: boolean;
-  onClick?: () => void;
+  onClick?: (_:any) => void;
 };
 
 export function ButtonDemo({

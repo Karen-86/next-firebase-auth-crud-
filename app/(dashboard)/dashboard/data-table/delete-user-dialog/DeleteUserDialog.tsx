@@ -1,82 +1,9 @@
-// old version delete after some time
-// "use client";
-
-// import React, { useState, useEffect } from "react";
-// import { ButtonDemo, DialogDemo, DropdownMenuDemo } from "@/components/index";
-// import { useFirebaseApiContext } from "@/context/FirebaseApiContext";
-// import { useDeleteAccount } from "@/hooks/useDeleteAccount";
-
-// export const DeleteUserDialog = ({ id = "" }) => {
-//   return (
-//     <DialogDemo contentClassName="" trigger={<div>{`${"Remove User"}`}</div>}>
-//       {(closeDialog) => <DeleteUserDialogContent id={id} closeDialog={closeDialog} />}
-//     </DialogDemo>
-//   );
-// };
-
-// const DeleteUserDialogContent = ({ id = "", closeDialog = () => {} }) => {
-//   const [isLoading, setIsLoading] = useState(false);
-//   // const { updateUser, getUsers } = useFirebaseApiContext();
-//   const { deleteAccount } = useDeleteAccount();
-
-//   // const handleDeleteUser = (id = "") => {
-//   //   const updatedFields: { [key: string]: any } = {};
-
-//   //   updatedFields.isDeleted = true;
-
-//   //   updateUser({
-//   //     id: id,
-//   //     updatedFields,
-//   //     setIsLoading,
-//   //     callback: () => {
-//   //       getUsers({})
-//   //       closeDialog();
-//   //     },
-//   //   });
-//   // };
-
-//   const handleFullUserDelete =  () => {
-//     deleteAccount({ setIsLoading });
-//   };
-
-//   return (
-//     <div className="crop-avatar-dialog">
-//       <h2 className="text-2xl text-center mb-5 max-w-[300px] mx-auto">Are you sure you want to delete this user?</h2>
-//       <br />
-//       <br />
-
-//       <div className="button-group flex gap-2 justify-end">
-//         <ButtonDemo
-//           className=""
-//           text="Cancel"
-//           variant="outline"
-//           type="button"
-//           onClick={() => {
-//             closeDialog();
-//           }}
-//           disabled={isLoading}
-//         />
-//         <ButtonDemo
-//           className=""
-//           text={`${isLoading ? "Loading..." : "Submit"}`}
-//           variant="destructive"
-//           disabled={isLoading}
-//           onClick={() => {
-//             handleFullUserDelete()
-//           }}
-//         />
-//       </div>
-//     </div>
-//   );
-// };
-
 "use client";
 
 import React, { useState, useEffect } from "react";
 import { ButtonDemo, DialogDemo, InputDemo } from "@/components/index";
-// import { useDeleteAccount } from "@/hooks/useDeleteAccount";
-import { useDeleteUser } from "@/hooks/useDeleteUser";
 import { useFirebaseApiContext } from "@/context/FirebaseApiContext";
+import { useFirebaseAuthContext } from "@/context/FirebaseAuthContext";
 
 export const DeleteUserDialog = ({ uid = "" }) => {
   return (
@@ -90,12 +17,11 @@ const DeleteUserDialogContent = ({ uid = "", closeDialog = () => {} }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [confirmationText, setConfirmationText] = useState("");
   const { getUsers } = useFirebaseApiContext();
-
-  const { deleteUser } = useDeleteUser();
+  const { handleDeleteUser } = useFirebaseAuthContext();
 
   return (
     <div className="delete-user-dialog">
-      <h2 className="text-2xl !font-semibold mb-5">Delete account</h2>
+      <h2 className="text-2xl font-semibold! mb-5">Delete account</h2>
       <p className="text-sm text-gray-500 mb-6 leading-[1.6]">
         Are you sure you want to delete this user? This will permanently remove the user's account.{" "}
         <span className="text-red-400">This action cannot be undone.</span>
@@ -131,7 +57,7 @@ const DeleteUserDialogContent = ({ uid = "", closeDialog = () => {} }) => {
           disabled={confirmationText !== "Delete account" || isLoading}
           onClick={() => {
             if (uid) {
-              deleteUser({
+              handleDeleteUser({
                 uid: uid,
                 setIsLoading,
                 callback: () => {

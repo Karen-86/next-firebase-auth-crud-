@@ -4,7 +4,7 @@ import React, { useEffect, useState } from "react";
 import { Header, Footer, LoadingScreen } from "@/components/index.js";
 import { motion } from "framer-motion";
 import { useFirebaseApiContext } from "@/context/FirebaseApiContext";
-import { SectionProps } from "@/data/websiteOriginalContent";
+import { SectionProps } from "@/lib/data/websiteOriginalContent";
 
 export default function Template() {
   const { fetchedPages, getSinglePage } = useFirebaseApiContext();
