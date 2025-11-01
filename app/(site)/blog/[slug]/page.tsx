@@ -6,9 +6,12 @@ import { Blog } from "@/types/index";
 export const revalidate = 600; // 10min
 // export const dynamic = "force-dynamic";
 
-export async function generateMetadata({ params }: { params: { slug: string } }) {
-  const { slug } = params;
+const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://next-modules.vercel.app";
+
+export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }) {
+  const slug = (await params).slug;
   const details: Blog = await fetchBlog({ subDocumentId: slug });
+  console.log(details.images?.map((img) => img.url));
 
   return {
     title: details.seoTitle || details.title,
@@ -17,15 +20,15 @@ export async function generateMetadata({ params }: { params: { slug: string } })
       title: details.seoTitle || details.title,
       description: details.seoDescription || details.shortDescription || "",
       type: "article",
-      images: details.images?.map((img) => img.url) || [],
+      images: details.images?.map((img) => `${siteUrl}/${img.url}`) || [],
     },
   };
 }
 
-export default async function page({ params }: { params: { slug: string } }) {
-  const slug = params.slug; 
+export default async function page({ params }: { params: Promise<{ slug: string }> }) {
+  const slug = (await params).slug;
 
-  const details: Blog = await fetchBlog({subDocumentId: slug})
+  const details: Blog = await fetchBlog({ subDocumentId: slug });
 
   return <BlogDetails details={details} />;
 }
