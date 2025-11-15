@@ -32,10 +32,9 @@ export const metadata: Metadata = {
   authors: [{ name: "Karen A.", url: "https://www.linkedin.com/in/karen86/" }],
   icons: {
     icon: [
-      { rel: "icon", url: "/assets/images/favicon/favicon-32x32.png", sizes: "32x32" },
-      { rel: "icon", url: "/assets/images/favicon/favicon-16x16.png", sizes: "16x16" },
+      { rel: "icon", url: "/assets/images/favicon/favicon.png"},
     ],
-    apple: "/assets/images/favicon/apple-icon.png", // 180x180 recommended
+    apple: "/assets/images/favicon/favicon.png", // 180x180 recommended
   },
   openGraph: {
     title: "Sheet - Your Website Name",
