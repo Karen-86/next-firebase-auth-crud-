@@ -147,7 +147,7 @@ export const SettingsProfile = () => {
                       size="sm"
                       startIcon={<img src={googleLogoIcon} className="h-4" />}
                       text={`${isLoading ? "Signing In..." : "Connect Google"} `}
-                      className={`  text-gray-700 text-xs`}
+                      className={`  text-gray-700 dark:text-white text-xs`}
                       disabled={!isEmailVerified || isLoading}
                       variant="ghost"
                       onClick={() => handleSignInWithGoogle({})}
@@ -184,7 +184,7 @@ export const SettingsProfile = () => {
           <div className="capitalize font-medium">
             <div className="">
               {isGoogleSignInMethodEnabled && <div className="[&>svg]:w-5 [&>svg]:h-5">{googleIcon}</div>}
-              {isEmailPasswordMethodEnabled && <div className="[&>svg]:w-5 [&>svg]:h-5">{emailIcon}</div>}
+              {isEmailPasswordMethodEnabled && <div className="[&>svg]:w-5 [&>svg]:h-5 [&>svg]:fill-current">{emailIcon}</div>}
             </div>
           </div>
         </div>

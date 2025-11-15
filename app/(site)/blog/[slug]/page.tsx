@@ -4,10 +4,10 @@ import { fetchBlog, fetchBlogs } from "@/lib/fetchers/blogs";
 import { Blog } from "@/types/index";
 import { notFound } from "next/navigation";
 
-// export const revalidate = 600; // 10min
-export const dynamic = "force-dynamic";
+export const revalidate = 60; // 1min
+// export const dynamic = "force-dynamic";
 
-const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://next-modules.vercel.app";
+const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }) {
   const slug = (await params).slug;
@@ -28,7 +28,6 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
 
 export async function generateStaticParams() {
   const { data } = await fetchBlogs();
-
   const blogList: Blog[] = data;
   return blogList.map((blog: any) => blog);
 }

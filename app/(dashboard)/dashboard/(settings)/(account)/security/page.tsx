@@ -28,7 +28,7 @@ const Page = () => {
 };
 
 
-const SettingsSecurity = () => {
+export const SettingsSecurity = () => {
   const [isEmailPasswordMethodEnabled, setIsEmailPasswordMethodEnabled] = useState(false);
 
   const { currentUser } = useFirebaseAuthContext();

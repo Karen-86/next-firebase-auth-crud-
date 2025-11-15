@@ -8,8 +8,8 @@ const page = async ({ params }: { params: Promise<{ section: string }> }) => {
 
   const breadcrumbItems = [
     {
-      href: "/",
-      label: "Home",
+      href: "/dashboard",
+      label: "Dashboard",
     },
     {
       href: "/dashboard/website",

@@ -78,9 +78,9 @@ export function TableDemo({ invoices = [] }: InvoicesProps) {
         {/* <TableCaption className="mb-5">A list of your recent invoices.</TableCaption> */}
         <TableHeader className="">
           <TableRow className=" hover:bg-current-color">
-            <TableHead className="px-5 py-[10px] w-[100px] ">#</TableHead>
-            <TableHead className="px-5 py-[10px] ">Name</TableHead>
-            <TableHead className="px-5 py-[10px] text-right ">Edit</TableHead>
+            <TableHead className="px-5 py-2.5 w-[100px] ">#</TableHead>
+            <TableHead className="px-5 py-2.5 ">Name</TableHead>
+            <TableHead className="px-5 py-2.5 text-right ">Edit</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -92,8 +92,8 @@ export function TableDemo({ invoices = [] }: InvoicesProps) {
               key={invoice.invoice}
               className={` ${invoice.isDisabled ? "opacity-20 pointer-events-none" : ""} cursor-pointer group`}
             >
-              <TableCell className="font-medium px-5 py-[10px]">{invoice.invoice}</TableCell>
-              <TableCell className=" px-5 py-[10px]">
+              <TableCell className="font-medium px-5 py-2.5">{invoice.invoice}</TableCell>
+              <TableCell className=" px-5 py-2.5">
                 <div className=" group-hover:underline">
 
                 {invoice.name}
@@ -107,7 +107,7 @@ export function TableDemo({ invoices = [] }: InvoicesProps) {
         </TableBody>
         <TableFooter>
           <TableRow className="hover:bg-current-color">
-            <TableCell colSpan={4} className="text-center px-3 py-[10px]">
+            <TableCell colSpan={4} className="text-center px-3 py-2.5">
               A list of your sections.
             </TableCell>
             {/* <TableCell colSpan={3}>Total</TableCell> */}

@@ -2,7 +2,7 @@
 
 import React from "react";
 import localData from "@/localData";
-import { ButtonDemo, ModeToggle } from "@/components/index.js";
+import { ButtonDemo, ModeToggle, NavUserDemo } from "@/components/index.js";
 import { NavigationMenuDemo } from "./NavigationMenuDemo";
 import { SidebarNavigationMenuDemo } from "./SidebarNavigationMenuDemo";
 import { useFirebaseAuthContext } from "@/context/FirebaseAuthContext";
@@ -46,14 +46,20 @@ export default function Navbar() {
 
         <NavigationMenuDemo />
 
-        <SidebarNavigationMenuDemo />
-
-        <div className="btn-group  gap-2 hidden lg:flex">
-          <Link href={` ${currentUser ? "/dashboard" : "/sign-up"}`}>
-            <ButtonDemo variant="ghost" text={` ${currentUser ? "Dashboard" : "Sign Up"}`} />
-          </Link>
-          <ModeToggle />
+        <div className="flex items-center">
+          <div className="min-w-[88px] flex justify-end">
+            {currentUser ? (
+              <NavUserDemo triggerClassName=" rounded-full! h-10 w-10 [&_.user-details]:hidden" />
+            ) : (
+              <Link href={`/sign-up`}>
+                <ButtonDemo variant="ghost" text={`Sign Up`} />
+              </Link>
+            )}
+          </div>
+          <SidebarNavigationMenuDemo />
         </div>
+
+        {/* <div className="btn-group  gap-2 hidden lg:flex min-w-[100px] justify-end"></div> */}
       </div>
     </nav>
   );

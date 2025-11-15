@@ -29,7 +29,7 @@ type DropdownProps = {
   contentClassName?: string;
   triggerClassName?: string;
   variant?: "default" | "destructive" | "outline" | "secondary" | "ghost" | "link";
-  defaultItems: ItemsProps[];
+  defaultItems?: ItemsProps[];
   children?: ReactNode;
   callback?: (items: ItemsProps[]) => void;
   side?: "top" | "right" | "bottom" | "left" | undefined;

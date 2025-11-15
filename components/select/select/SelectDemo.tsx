@@ -78,7 +78,7 @@ export function SelectDemo({
         }}
         // open={true}
       >
-        <SelectTrigger id={id} className={`select-trigger w-full min-w-[0] cursor-pointer  ${triggerClassName}`}>
+        <SelectTrigger id={id} className={`select-trigger w-full min-w-0 cursor-pointer  ${triggerClassName}`}>
           <SelectValue placeholder={placeholder} />
         </SelectTrigger>
         <SelectContent side={side} align={align} className={`select-content max-w-[350px] max-h-[300px] ${contentClassName}`}>
@@ -87,11 +87,11 @@ export function SelectDemo({
             {items.length ? (
               items.map((item, index) => {
                 return (
-                  <SelectItem key={index} value={item.value.toString()} className="select-item cursor-pointer flex">
+                  <SelectItem key={index} value={item.value.toString()} className="select-item cursor-pointer flex rounded-none">
                     <div className="select-item-inner flex items-center gap-2  ">
-                      {item.startIcon && <span className="w-[16px]">{item.startIcon}</span>}
+                      {item.startIcon && <span className="w-4">{item.startIcon}</span>}
                       <span className="select-text">{item.label}</span> {/* max-w-[180px] truncate */}
-                      {item.endIcon && <span className="ml-auto w-[16px]">{item.endIcon}</span>}
+                      {item.endIcon && <span className="ml-auto w-4">{item.endIcon}</span>}
                     </div>
                   </SelectItem>
                 );

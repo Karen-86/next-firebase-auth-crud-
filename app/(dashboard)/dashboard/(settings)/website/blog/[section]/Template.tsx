@@ -51,7 +51,7 @@ const Template = ({ section = "" }) => {
               type="multiple"
               className=""
               itemClassName={`!border rounded-md mb-[0.5rem] overflow-hidden`}
-              triggerClassName="!rounded-none text-[16px] font-normal !no-underline p-4 hover:bg-slate-100 rounded-md"
+              triggerClassName="!rounded-none text-[16px] font-normal !no-underline p-4 hover:bg-slate-100 dark:hover:bg-neutral-700 rounded-md"
               items={filteredBlogList.map((blogItem: any, index: any) => {
                 return {
                   itemClassName: blogItem.slug,

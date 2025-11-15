@@ -72,7 +72,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   return (
     <Sidebar collapsible="icon" {...props} className="sidebar ">
       <SidebarHeader className="py-[18px] ">
-        <SidebarMenuButton className="hover:bg-transparent">
+        <SidebarMenuButton className="hover:bg-transparent active:bg-transparent">
           <Link href="/">
             <h2
               className={`text-gray-600 text-lg font-medium group-data-[collapsible=icon]:hidden whitespace-nowrap duration-200 pointer-events-none`}
@@ -93,9 +93,9 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                   asChild
                   className={` ${
                     (item.url === "/dashboard" ? pathname === "/dashboard" : pathname.startsWith(item.url))
-                      ? "bg-gray-200 hover:bg-neutral-200"
+                      ? "bg-gray-200 hover:bg-neutral-200 dark:bg-neutral-700 "
                       : ""
-                  }  px-3 py-[18px]`}
+                  }  px-3 py-[18px] `}
                 >
                   <Link href={item.url}>
                     {item.icon}
@@ -116,7 +116,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                   asChild
                   className={` ${
                     (item.url === "/dashboard" ? pathname === "/dashboard" : pathname.startsWith(item.url))
-                      ? "bg-gray-200 hover:bg-neutral-200"
+                      ? "bg-gray-200 hover:bg-neutral-200 dark:bg-neutral-700"
                       : ""
                   }  px-3 py-[18px]`}
                 >
@@ -146,7 +146,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                             asChild
                             className={` ${
                               (subItem.url === "/dashboard" ? pathname === "/dashboard" : pathname.startsWith(subItem.url))
-                                ? "bg-neutral-200 hover:bg-neutral-200"
+                                ? "bg-neutral-200 hover:bg-neutral-200 dark:bg-neutral-700"
                                 : ""
                             }  px-3 py-[18px]`}
                           >
