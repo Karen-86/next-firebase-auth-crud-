@@ -73,7 +73,7 @@ const UpdateEmailContent = ({ closeDialog = () => {} }) => {
 
   return (
     <form onSubmit={onSubmit} className={`${wasSubmitted ? "was-submitted" : ""} max-w-[360px] mx-auto text-xs`}>
-      <h2 className="text-xs !font-semibold mb-5">Update Email</h2>
+      <h2 className="text-xs font-semibold! mb-5">Update Email</h2>
       <p className=" text-gray-500 mb-6 leading-[1.6]">
         Enter your new email address below. We’ll send a verification link to confirm the change.
       </p>

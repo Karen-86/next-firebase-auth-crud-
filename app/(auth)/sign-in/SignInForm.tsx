@@ -67,7 +67,10 @@ const SignInForm = () => {
     }
     const isPasswordAdded = sessionStorage.getItem("isPasswordAdded");
     if (isPasswordAdded) {
-      setTimeout(() => successAlert("Successfully linked email/password account! Please sign in again."), 100);
+      setTimeout(() => {
+        successAlert("Verification email sent! Please check your inbox.");
+        successAlert("Successfully linked email/password account! Please sign in again.");
+      }, 100);
       sessionStorage.removeItem("isPasswordAdded");
     }
     const isPasswordUpdated = sessionStorage.getItem("isPasswordUpdated");

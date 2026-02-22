@@ -507,6 +507,7 @@ export default function FirebaseApiProvider({
     setIsLoading(false);
     callback();
   };
+  
   const deleteContentSubCollection = async ({
     collectionName = "",
     documentId = "",

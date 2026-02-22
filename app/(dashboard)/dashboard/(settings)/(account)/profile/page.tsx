@@ -117,7 +117,8 @@ export const SettingsProfile = () => {
             </div>
             <div>
               <div className="ml-auto w-fit">
-                {isEmailPasswordMethodEnabled && !isGoogleSignInMethodEnabled && <UpdateEmailDialog />}
+                {/* {isEmailPasswordMethodEnabled && !isGoogleSignInMethodEnabled && <UpdateEmailDialog />} */}
+                { <UpdateEmailDialog />}
               </div>
             </div>
           </div>

@@ -207,6 +207,7 @@ export default function FirebaseAuthProvider({
       sessionStorage.setItem("isSignedOut", "true");
       // router.push("/sign-in");
       window.location.href = "/sign-in";
+      callback()
     } catch (err: any) {
       errorAlert(err.message || "Internal server error. Please try again later.");
       console.error(err, "=handleSignOut= request error");
@@ -275,7 +276,7 @@ export default function FirebaseAuthProvider({
     const credential = EmailAuthProvider.credential(email, password);
     try {
       await linkWithCredential(currentUser, credential);
-      handleEmailVerification({ user: currentUser });
+      await handleEmailVerification({ user: currentUser });
       successAlert("Successfully linked email/password account!");
       callback();
     } catch (err: any) {
