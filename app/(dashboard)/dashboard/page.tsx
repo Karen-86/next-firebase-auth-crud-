@@ -6,7 +6,7 @@ import { DataTableDemo } from "./data-table/DataTableDemo";
 import { Payment, columns } from "./data-table/columns";
 import localData from "@/localData";
 import { Card, CardContent } from "@/components/ui/card";
-import { useFirebaseApiContext } from "@/context/FirebaseApiContext";
+import { useUsersContext } from "@/context/api/UsersContext";
 
 const {  } = localData.images;
 
@@ -20,17 +20,17 @@ const Page = () => {
   const [filteredData, setFilteredData] = useState<Payment[]>([]);
   // const data = getData();
 
-  const { getUsers, fetchedUsers } = useFirebaseApiContext();
+  const { getUsers, fetchedUsers } = useUsersContext();
+
+  // useEffect(() => {
+  //   getUsers();
+  // }, []);
 
   useEffect(() => {
-    getUsers({});
-  }, []);
-
-  useEffect(() => {
-    if (!fetchedUsers.list.length) return;
+    if (!fetchedUsers.data.length) return;
 
     const getData = (): Payment[] => {
-      return fetchedUsers.list
+      return fetchedUsers.data
         .filter((item) => item.isDeleted !== true)
         .map((item) => {
           return {

@@ -17,26 +17,36 @@ const breadcrumbItems = [
 const sections = [
   {
     invoice: "1",
-    name: "Header",
-    href: "/dashboard/website/home-page/header",
+    name: "Metadata",
+    href: "/dashboard/website/home-page/edit-metadata",
   },
-
   {
-    invoice: "3",
-    name: "Features",
-    href: "/dashboard/website/home-page/features",
+    invoice: "2",
+    name: "Header",
+    href: "/dashboard/website/home-page/edit-header",
     isDisabled: true,
   },
   {
+    invoice: "3",
+    name: "Hero",
+    href: "/dashboard/website/home-page/edit-hero-section",
+  },
+  {
     invoice: "4",
-    name: "Contact",
-    href: "/dashboard/website/home-page/contact",
+    name: "Features",
+    href: "/dashboard/website/home-page/edit-features-section",
     isDisabled: true,
   },
   {
     invoice: "5",
+    name: "Contact",
+    href: "/dashboard/website/home-page/edit-contact-section",
+    isDisabled: true,
+  },
+  {
+    invoice: "6",
     name: "Footer",
-    href: "/dashboard/website/home-page/footer",
+    href: "/dashboard/website/home-page/edit-footer",
     isDisabled: true,
   },
 ];
@@ -45,19 +55,23 @@ const blog = [
   {
     invoice: "1",
     name: "Header",
-    href: "/dashboard/website/blog/header",
+    href: "/dashboard/website/blogs/blog/edit-header",
     isDisabled: true,
   },
   {
     invoice: "2",
-    name: "Blog",
-    href: "/dashboard/website/blog/blog-list",
+    name: (
+      <div>
+        Blog <span className="text-gray-500 text-xs"> (dynamic page, Metadata included)</span>
+      </div>
+    ),
+    href: "/dashboard/website/blogs/blog/edit-details",
     isDisabled: false,
   },
   {
     invoice: "3",
     name: "Footer",
-    href: "/dashboard/website/blog/footer",
+    href: "/dashboard/website/blogs/blog/edit-footer",
     isDisabled: true,
   },
 ];

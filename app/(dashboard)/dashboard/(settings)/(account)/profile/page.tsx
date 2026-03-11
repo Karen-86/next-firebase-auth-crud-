@@ -1,8 +1,8 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { useFirebaseAuthContext } from "@/context/FirebaseAuthContext";
-import { useFirebaseApiContext } from "@/context/FirebaseApiContext";
+import { useAuthContext } from "@/context/api/AuthContext";
+import { useUsersContext } from "@/context/api/UsersContext";
 import { ButtonDemo, BreadcrumbDemo, TooltipDemo, UpdateEmailDialog, UpdateProfileDialog } from "@/components/index";
 import { Card, CardContent } from "@/components/ui/card";
 import localData from "@/localData";
@@ -20,7 +20,6 @@ const breadcrumbItems = [
   },
 ];
 
-
 const Page = () => {
   return (
     <main className="pages-page p-5 mb-[150px]">
@@ -28,7 +27,7 @@ const Page = () => {
       <BreadcrumbDemo items={breadcrumbItems} />
       <br />
       <br />
-      <SettingsProfile/>
+      <SettingsProfile />
     </main>
   );
 };
@@ -39,22 +38,18 @@ export const SettingsProfile = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [isEmailVerified, setIsEmailVerified] = useState(false);
 
-  const { currentUser, handleSignInWithGoogle } = useFirebaseAuthContext();
-  const { fetchedCurrentUser, fetchedUsers } = useFirebaseApiContext();
+  const { currentUser, handleSignInWithGoogle, fetchedCurrentUser } = useAuthContext();
+  const { fetchedUsers } = useUsersContext();
 
-  const { email, role, base64PhotoURL, photoURL, displayName } = fetchedCurrentUser.details;
+  const { email, role, base64PhotoURL, photoURL, displayName } = fetchedCurrentUser.data;
 
   useEffect(() => {
     if (!currentUser) return;
     const _isEmailPasswordMethodEnabled = currentUser.providerData.find((item) => item.providerId === "password");
-    if (_isEmailPasswordMethodEnabled) {
-      setIsEmailPasswordMethodEnabled(true);
-    }
+    _isEmailPasswordMethodEnabled ? setIsEmailPasswordMethodEnabled(true) : setIsEmailPasswordMethodEnabled(false);
 
     const _isGoogleSignInMethodEnabled = currentUser.providerData.find((item) => item.providerId === "google.com");
-    if (_isGoogleSignInMethodEnabled) {
-      setIsGoogleSignInMethodEnabled(true);
-    }
+    _isGoogleSignInMethodEnabled ? setIsGoogleSignInMethodEnabled(true) : setIsGoogleSignInMethodEnabled(false);
 
     setIsEmailVerified(currentUser.emailVerified);
   }, [currentUser]);
@@ -62,8 +57,8 @@ export const SettingsProfile = () => {
   const [admins, setAdmins] = useState<any[]>([]);
 
   useEffect(() => {
-    if (!fetchedUsers.list.length) return;
-    setAdmins(fetchedUsers.list.filter((user) => user.role === "admin"));
+    if (!fetchedUsers.data.length) return;
+    setAdmins(fetchedUsers.data.filter((user) => user.roles.includes("admin")));
   }, [fetchedUsers]);
 
   return (
@@ -118,7 +113,7 @@ export const SettingsProfile = () => {
             <div>
               <div className="ml-auto w-fit">
                 {/* {isEmailPasswordMethodEnabled && !isGoogleSignInMethodEnabled && <UpdateEmailDialog />} */}
-                { <UpdateEmailDialog />}
+                {<UpdateEmailDialog />}
               </div>
             </div>
           </div>
@@ -149,7 +144,7 @@ export const SettingsProfile = () => {
                       startIcon={<img src={googleLogoIcon} className="h-4" />}
                       text={`${isLoading ? "Signing In..." : "Connect Google"} `}
                       className={`  text-gray-700 dark:text-white text-xs`}
-                      disabled={!isEmailVerified || isLoading}
+                      disabled={isLoading}
                       variant="ghost"
                       onClick={() => handleSignInWithGoogle({})}
                     />
@@ -165,8 +160,8 @@ export const SettingsProfile = () => {
                         }
                         content={
                           <div>
-                            Your email isn’t verified yet. Please verify it first, and only then try connecting Google to avoid
-                            losing your password login access.
+                            We recommend verifying your email first before connecting Google to avoid losing the
+                            password login method.
                           </div>
                         }
                       />
@@ -185,7 +180,9 @@ export const SettingsProfile = () => {
           <div className="capitalize font-medium">
             <div className="">
               {isGoogleSignInMethodEnabled && <div className="[&>svg]:w-5 [&>svg]:h-5">{googleIcon}</div>}
-              {isEmailPasswordMethodEnabled && <div className="[&>svg]:w-5 [&>svg]:h-5 [&>svg]:fill-current">{emailIcon}</div>}
+              {isEmailPasswordMethodEnabled && (
+                <div className="[&>svg]:w-5 [&>svg]:h-5 [&>svg]:fill-current">{emailIcon}</div>
+              )}
             </div>
           </div>
         </div>
@@ -220,7 +217,7 @@ export const SettingsProfile = () => {
         <div className="flex items-center justify-between  gap-5 py-1">
           <div className="font-semibold">Super Admin:</div>
           <div className="capitalize font-medium">
-            {fetchedUsers.list.find((superAdmin) => superAdmin.role === "superAdmin")?.displayName || (
+            {fetchedUsers.data.find((users) => users.roles.includes("superAdmin"))?.displayName || (
               <span className=" text-gray-400">—</span>
             )}
           </div>

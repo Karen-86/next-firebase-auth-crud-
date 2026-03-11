@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { useFirebaseAuthContext } from "@/context/FirebaseAuthContext";
+import { useAuthContext } from "@/context/api/AuthContext";
 import { ButtonDemo, InputDemo, BreadcrumbDemo, DialogDemo, DeleteUserDialog } from "@/components/index";
 import useJoiValidation from "@/hooks/useJoiValidation";
 
@@ -28,7 +28,7 @@ const AddPasswordDialog = () => {
 const AddPasswordContent = ({ closeDialog = () => {} }) => {
   const [state, setState] = useState({ password: "", repeatPassword: "" });
   const [isLoading, setIsLoading] = useState(false);
-  const { handleLinkEmailPasswordAccount, currentUser, handleSignOut } = useFirebaseAuthContext();
+  const { handleLinkEmailPasswordAccount, currentUser, handleSignOut } = useAuthContext();
 
   const { validateAddPassword } = useJoiValidation();
   const [wasSubmitted, setWasSubmitted] = useState(false);

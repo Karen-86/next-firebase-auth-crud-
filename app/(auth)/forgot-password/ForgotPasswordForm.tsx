@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { useFirebaseAuthContext } from "@/context/FirebaseAuthContext";
+import { useAuthContext } from "@/context/api/AuthContext";
 import { ButtonDemo, InputDemo } from "@/components/index";
 import Link from "next/link";
 import useJoiValidation from "@/hooks/useJoiValidation";
@@ -16,7 +16,7 @@ type ValidationResult = {
 };
 
 const Login = () => {
-  const { handleResetPassword } = useFirebaseAuthContext();
+  const { handleResetPassword } = useAuthContext();
   const [state, setState] = useState({ email: "" });
   const [isLoading, setIsLoading] = useState(false);
 

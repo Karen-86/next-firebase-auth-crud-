@@ -2,7 +2,7 @@
 // import React, { useState, useEffect } from "react";
 
 // import { BadgeCheck, Bell, ChevronDown, CreditCard, LogOut, Sparkles } from "lucide-react";
-// import { useFirebaseAuthContext } from "@/context/FirebaseAuthContext";
+// import { useAuthContext } from "@/context/api/AuthContext";
 // import { useFirebaseApiContext } from "@/context/FirebaseApiContext";
 // import Link from "next/link";
 
@@ -23,7 +23,7 @@
 // const { avatarPlaceholderImage, ellipsisPreloaderImage } = localData.images;
 
 // const NavUser = () => {
-//   const { handleSignOut, currentUser } = useFirebaseAuthContext();
+//   const { handleSignOut, currentUser } = useAuthContext();
 //   const { fetchedCurrentUser } = useFirebaseApiContext();
 //   const { details } = fetchedCurrentUser;
 //   const [user, setUser] = useState<any>({

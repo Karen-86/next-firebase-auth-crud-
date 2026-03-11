@@ -2,8 +2,7 @@
 import React, { useState, useEffect } from "react";
 
 import { BadgeCheck, Bell, CreditCard, LogOut, Sparkles, Sun, Moon, User, ChevronDown, Settings } from "lucide-react";
-import { useFirebaseAuthContext } from "@/context/FirebaseAuthContext";
-import { useFirebaseApiContext } from "@/context/FirebaseApiContext";
+import { useAuthContext } from "@/context/api/AuthContext";
 import Link from "next/link";
 import { useTheme } from "next-themes";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -24,9 +23,8 @@ const { avatarPlaceholderImage, ellipsisPreloaderImage } = localData.images;
 const { userIcon } = localData.svgs;
 
 export default function NavUserDemo({ trigger = "", triggerClassName = "", contentClassName = "", align = "end" }: any) {
-  const { handleSignOut, currentUser } = useFirebaseAuthContext();
-  const { fetchedCurrentUser } = useFirebaseApiContext();
-  const { details } = fetchedCurrentUser;
+  const { handleSignOut, fetchedCurrentUser } = useAuthContext();
+  const { data } = fetchedCurrentUser;
   const [user, setUser] = useState<any>({
     name: "",
     email: "",
@@ -43,12 +41,12 @@ export default function NavUserDemo({ trigger = "", triggerClassName = "", conte
 
   useEffect(() => {
     setUser({
-      name: details?.displayName || "",
-      email: details?.email || "",
-      photoURL: details?.photoURL || null,
-      base64PhotoURL: details?.base64PhotoURL || null,
+      name: data?.displayName || "",
+      email: data?.email || "",
+      photoURL: data?.photoURL || null,
+      base64PhotoURL: data?.base64PhotoURL || null,
     });
-  }, [details]);
+  }, [data]);
 
   const [isManageAccoundDialogOpen, setIsManageAccountDialogOpen] = useState(false);
 

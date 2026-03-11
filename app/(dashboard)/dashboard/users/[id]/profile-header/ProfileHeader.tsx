@@ -6,14 +6,13 @@ import { Camera, X } from "lucide-react";
 const { bannerPlaceholderImage, avatarPlaceholderImage } = localData.images;
 
 const ProfileHeader = ({details = {}}: {details: any}) => {
-  console.log(details, ' jjj')
   return (
     <div className="profile-header ">
       <div className="relative h-0 pt-[50%] sm:pt-[30%] bg-gray-100 rounded-lg ">
         {true && (
           <img
             className="banner absolute top-0 left-0 w-full h-full object-cover rounded-lg border"
-            src={details?.collectionMedia?.base64URL || bannerPlaceholderImage}
+            src={details?.banner?.base64URL || bannerPlaceholderImage}
             alt=""
           />
         )}

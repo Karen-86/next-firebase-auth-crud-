@@ -2,26 +2,26 @@
 
 import React, { useState, useEffect } from "react";
 import { ButtonDemo, DialogDemo, InputDemo } from "@/components/index";
-import { useFirebaseAuthContext } from "@/context/FirebaseAuthContext";
+import { useAuthContext } from "@/context/api/AuthContext";
+import { useUsersContext } from "@/context/api/UsersContext";
 
-export const DeleteUserDialog = ({ id = "" }) => {
+export const DeleteUserDialog = ({ userId = "" }) => {
   return (
     <DialogDemo
       contentClassName=""
-      trigger={
-        <ButtonDemo text={`${"Delete Account"}`}  className={`text-sm flex `} variant="outlineDanger" />
-      }
+      trigger={<ButtonDemo text={`${"Delete Account"}`} className={`text-sm flex `} variant="outlineDanger" />}
     >
-      {(closeDialog) => <DeleteUserDialogContent id={id} closeDialog={closeDialog} />}
+      {(closeDialog) => <DeleteUserDialogContent userId={userId} closeDialog={closeDialog} />}
     </DialogDemo>
   );
 };
 
-const DeleteUserDialogContent = ({ id = "", closeDialog = () => {} }) => {
+const DeleteUserDialogContent = ({ userId = "", closeDialog = () => {} }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [confirmationText, setConfirmationText] = useState("");
 
-  const { currentUser , handleDeleteUser} = useFirebaseAuthContext();
+  const { currentUser } = useAuthContext();
+  const { deleteUser } = useUsersContext();
 
   return (
     <div className="delete-user-dialog">
@@ -60,7 +60,7 @@ const DeleteUserDialogContent = ({ id = "", closeDialog = () => {} }) => {
           // disabled={!password || isLoading}
           disabled={confirmationText !== "Delete account" || isLoading}
           onClick={() => {
-            if (currentUser) handleDeleteUser({uid:currentUser.uid,setIsLoading});
+            if (userId) deleteUser({ userId, setIsLoading });
           }}
         />
       </div>

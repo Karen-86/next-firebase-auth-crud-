@@ -3,7 +3,7 @@ import { v4 as uuidv4 } from "uuid";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 
 type ItemsProps = {
-  trigger: string;
+  trigger: string | ReactNode;
   content: string | ReactNode;
 };
 

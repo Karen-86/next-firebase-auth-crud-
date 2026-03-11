@@ -5,7 +5,7 @@ import localData from "@/localData";
 import { ButtonDemo, ModeToggle, NavUserDemo } from "@/components/index.js";
 import { NavigationMenuDemo } from "./NavigationMenuDemo";
 import { SidebarNavigationMenuDemo } from "./SidebarNavigationMenuDemo";
-import { useFirebaseAuthContext } from "@/context/FirebaseAuthContext";
+import { useAuthContext } from "@/context/api/AuthContext";
 import Link from "next/link";
 
 const { logo } = localData.images;
@@ -13,7 +13,7 @@ const { logo } = localData.images;
 export const navLinks = [
   { title: "Home", href: "/" },
   { title: "About", href: "/about" },
-  { title: "Blog", href: "/blog" },
+  { title: "Blogs", href: "/blogs" },
 ];
 
 export const dropdownLinksModules: { title: string; href: string; description: string }[] = [
@@ -35,7 +35,7 @@ export const dropdownLinksModules: { title: string; href: string; description: s
 ];
 
 export default function Navbar() {
-  const { currentUser } = useFirebaseAuthContext();
+  const { currentUser } = useAuthContext();
 
   return (
     <nav className="navbar absolute w-full">

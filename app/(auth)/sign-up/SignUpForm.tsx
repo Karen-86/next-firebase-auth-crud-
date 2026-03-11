@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { useFirebaseAuthContext } from "@/context/FirebaseAuthContext";
+import { useAuthContext } from "@/context/api/AuthContext";
 import { ButtonDemo, InputDemo } from "@/components/index";
 import Link from "next/link";
 import localData from "@/localData";
@@ -21,7 +21,7 @@ type ValidationResult = {
 const SignUpForm = () => {
   const [state, setState] = useState({ name: "", email: "", password: "", repeatPassword: "" });
   const [isLoading, setIsLoading] = useState(false);
-  const { handleSignUp, handleSignInWithGoogle } = useFirebaseAuthContext();
+  const { handleSignUp, handleSignInWithGoogle } = useAuthContext();
 
   const { validateSignUp } = useJoiValidation();
   const [wasSubmitted, setWasSubmitted] = useState(false);

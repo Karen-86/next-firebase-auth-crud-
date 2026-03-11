@@ -21,25 +21,22 @@ import { ButtonDemo, DialogDemo, DropdownMenuDemo } from "@/components/index";
 import { DeleteUserDialog } from "./delete-user-dialog/DeleteUserDialog";
 import { SetupUserDialog } from "./setup-user-dialog/SetupUserDialog";
 import Link from "next/link";
-import { useFirebaseApiContext } from "@/context/FirebaseApiContext";
+import { useAuthContext } from "@/context/api/AuthContext";
+import checkRoleHierarchy from "@/lib/utils/checkRoleHierarchy";
 
 const { avatarPlaceholderImage } = localData.images;
 
 export type Payment = {
   id?: string;
   uid?: string;
-  role?: string;
-  inGameID?: string;
+  roles?: string;
   // avatar?: string | React.ReactNode;
   name?: string;
   // email?: string;
-  power?: string;
-  mainTroop?: string;
-  troopLvl?: string;
   status?: "active" | "inactive";
   base64PhotoURL?: string;
   photoURL?: string;
-  details?: any;
+  data?: any;
 };
 
 const formatWithCommas = (value: string) => {
@@ -48,9 +45,7 @@ const formatWithCommas = (value: string) => {
   return Number(num).toLocaleString();
 };
 
-
 export const columns: ColumnDef<Payment>[] = [
-
   {
     accessorKey: "index",
     header: () => <div className="px-3 text-center">#</div>,
@@ -95,10 +90,6 @@ export const columns: ColumnDef<Payment>[] = [
     },
     cell: ({ row }) => <div className="capitalize">{row.getValue("displayName")}</div>,
   },
-
-
-
-
   {
     id: "actions",
     enableHiding: false,
@@ -115,8 +106,8 @@ const Actions = ({ row = {} }: { row: any }) => {
   //   console.log(items);
   // };
 
-  const { fetchedCurrentUser } = useFirebaseApiContext();
-  const { details } = fetchedCurrentUser;
+  const { fetchedCurrentUser } = useAuthContext();
+  const { data } = fetchedCurrentUser;
   return (
     <div className="flex justify-end">
       <DropdownMenu>
@@ -132,61 +123,29 @@ const Actions = ({ row = {} }: { row: any }) => {
             Copy payment ID
           </DropdownMenuItem> */}
           <DropdownMenuSeparator />
-          {details.uid !== row.original.uid && (
-            <DropdownMenuItem asChild className="cursor-pointer">
-              <Link href={`/dashboard/users/${row.original.id}`}>Visit Profile</Link>
-            </DropdownMenuItem>
-          )}
+          <DropdownMenuItem asChild className="cursor-pointer">
+            <Link
+              href={data.uid === row.original.uid ? "/dashboard/my-profile" : `/dashboard/users/${row.original.id}`}
+            >
+              {data.uid === row.original.uid ? "Profile" : "Visit Profile"}
+            </Link>
+          </DropdownMenuItem>
 
-          {canAccessUserSettings(
-            { role: details.role, uid: details.uid },
-            { role: row.original.role, uid: row.original.uid }
-          ) && (
+          {checkRoleHierarchy({ user: data, foundUser: row.original }) && (
             <DropdownMenuItem className="cursor-pointer" onSelect={(e) => e.preventDefault()}>
               <SetupUserDialog user={row.original} />
             </DropdownMenuItem>
           )}
-          {details.uid !== row.original.uid &&
-            canAccessUserSettings(
-              { role: details.role, uid: details.uid },
-              { role: row.original.role, uid: row.original.uid }
-            ) && (
-              <DropdownMenuItem className="cursor-pointer" onSelect={(e) => e.preventDefault()}>
-                <DeleteUserDialog uid={row.original.id} />
-              </DropdownMenuItem>
-            )}
 
-          {/* <DropdownMenuItem>View payment details</DropdownMenuItem> */}
+          {checkRoleHierarchy({ user: data, foundUser: row.original }) && (
+            <DropdownMenuItem className="cursor-pointer" onSelect={(e) => e.preventDefault()}>
+              <DeleteUserDialog userId={row.original.id} />
+            </DropdownMenuItem>
+          )}
+          {/* <DropdownMenuItem>View payment data</DropdownMenuItem> */}
         </DropdownMenuContent>
       </DropdownMenu>
     </div>
   );
 };
 
-type Role = "user" | "admin" | "superAdmin";
-function canAccessUserSettings(
-  currentUser: { role: Role; uid: string },
-  targetUser: { role: Role; uid: string }
-) {
-  const isSameUser = currentUser.uid === targetUser.uid;
-  const currentRole = currentUser.role;
-  const targetRole = targetUser.role;
-
-  if (currentUser.role === "user") {
-    return false;
-  }
-
-  if (currentRole === "admin") {
-    return isSameUser || targetRole === "user";
-  }
-
-  if (currentRole === "superAdmin") {
-    return isSameUser || ["user", "admin"].includes(targetRole);
-  }
-
-  if (currentRole === "user") {
-    return isSameUser;
-  }
-
-  return false;
-}

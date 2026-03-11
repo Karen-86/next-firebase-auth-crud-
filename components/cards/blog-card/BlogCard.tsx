@@ -18,7 +18,7 @@ const BlogCard = ({ image = "", title = "", description = "", slug = "" }) => {
   }, [image]);
 
   return (
-    <Link href={`blog/${slug}`} className="card blog-card">
+    <Link href={`blogs/${slug}`} className="card blog-card">
       <div className="card-header mb-2">
         <div className="img-wrapper rounded-sm overflow-hidden relative pt-[56.25%] h-0">
           {src ? (

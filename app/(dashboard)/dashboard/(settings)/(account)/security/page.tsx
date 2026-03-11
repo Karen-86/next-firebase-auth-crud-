@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { useFirebaseAuthContext } from "@/context/FirebaseAuthContext";
+import { useAuthContext } from "@/context/api/AuthContext";
 import { BreadcrumbDemo, DeleteUserDialog, AddPasswordDialog, UpdatePasswordDialog } from "@/components/index";
 import { Card, CardContent } from "@/components/ui/card";
 
@@ -31,7 +31,7 @@ const Page = () => {
 export const SettingsSecurity = () => {
   const [isEmailPasswordMethodEnabled, setIsEmailPasswordMethodEnabled] = useState(false);
 
-  const { currentUser } = useFirebaseAuthContext();
+  const { currentUser, fetchedCurrentUser: {data} } = useAuthContext();
 
   useEffect(() => {
     if (!currentUser) return;
@@ -61,7 +61,7 @@ export const SettingsSecurity = () => {
             <div></div>
             <div>
               <div className="ml-auto w-fit">
-                <DeleteUserDialog />
+                <DeleteUserDialog userId={data.id} />
               </div>
             </div>
           </div>

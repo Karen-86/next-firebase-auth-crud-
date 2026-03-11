@@ -2,22 +2,20 @@
 
 import React, { useState, useEffect } from "react";
 import { ButtonDemo, DialogDemo, InputDemo } from "@/components/index";
-import { useFirebaseApiContext } from "@/context/FirebaseApiContext";
-import { useFirebaseAuthContext } from "@/context/FirebaseAuthContext";
+import { useUsersContext } from "@/context/api/UsersContext";
 
-export const DeleteUserDialog = ({ uid = "" }) => {
+export const DeleteUserDialog = ({ userId = "" }) => {
   return (
     <DialogDemo contentClassName="" trigger={<div>{`${"Remove User"}`}</div>}>
-      {(closeDialog) => <DeleteUserDialogContent uid={uid} closeDialog={closeDialog} />}
+      {(closeDialog) => <DeleteUserDialogContent userId={userId} closeDialog={closeDialog} />}
     </DialogDemo>
   );
 };
 
-const DeleteUserDialogContent = ({ uid = "", closeDialog = () => {} }) => {
+const DeleteUserDialogContent = ({ userId = "", closeDialog = () => {} }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [confirmationText, setConfirmationText] = useState("");
-  const { getUsers } = useFirebaseApiContext();
-  const { handleDeleteUser } = useFirebaseAuthContext();
+  const { getUsers, deleteUser } = useUsersContext();
 
   return (
     <div className="delete-user-dialog">
@@ -56,13 +54,13 @@ const DeleteUserDialogContent = ({ uid = "", closeDialog = () => {} }) => {
           // disabled={!password || isLoading}
           disabled={confirmationText !== "Delete account" || isLoading}
           onClick={() => {
-            if (uid) {
-              handleDeleteUser({
-                uid: uid,
+            if (userId) {
+              deleteUser({
+                userId,
                 setIsLoading,
                 callback: () => {
                   closeDialog();
-                  setTimeout(() => getUsers({}), 1000);
+                  setTimeout(() => getUsers(), 1000);
                 },
               });
             }

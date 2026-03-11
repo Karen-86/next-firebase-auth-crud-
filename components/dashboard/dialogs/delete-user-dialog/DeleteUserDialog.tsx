@@ -2,26 +2,26 @@
 
 import React, { useState, useEffect } from "react";
 import { ButtonDemo, DialogDemo, InputDemo } from "@/components/index";
-import { useFirebaseAuthContext } from "@/context/FirebaseAuthContext";
+import { useAuthContext } from "@/context/api/AuthContext";
+import { useUsersContext } from "@/context/api/UsersContext";
 
- const DeleteUserDialog = ({ id = "" }) => {
+const DeleteUserDialog = ({ userId = "" }) => {
   return (
     <DialogDemo
       contentClassName="pt-4 pb-6"
-      trigger={
-        <ButtonDemo text={`${"Delete Account"}`}  className={``} size='xs' variant="ghostDanger" />
-      }
+      trigger={<ButtonDemo text={`${"Delete Account"}`} className={``} size="xs" variant="ghostDanger" />}
     >
-      {(closeDialog) => <DeleteUserDialogContent id={id} closeDialog={closeDialog} />}
+      {(closeDialog) => <DeleteUserDialogContent userId={userId} closeDialog={closeDialog} />}
     </DialogDemo>
   );
 };
 
-const DeleteUserDialogContent = ({ id = "", closeDialog = () => {} }) => {
+const DeleteUserDialogContent = ({ userId = "", closeDialog = () => {} }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [confirmationText, setConfirmationText] = useState("");
 
-  const { currentUser, handleDeleteUser } = useFirebaseAuthContext();
+  const { currentUser } = useAuthContext();
+  const { deleteUser } = useUsersContext();
 
   return (
     <div className="delete-user-dialog text-xs">
@@ -46,7 +46,7 @@ const DeleteUserDialogContent = ({ id = "", closeDialog = () => {} }) => {
         <ButtonDemo
           className=""
           text="Cancel"
-          size='xs'
+          size="xs"
           variant="ghost"
           type="button"
           onClick={() => {
@@ -58,18 +58,17 @@ const DeleteUserDialogContent = ({ id = "", closeDialog = () => {} }) => {
         <ButtonDemo
           className=""
           text={`${isLoading ? "Loading..." : "Delete Account"}`}
-          size='xs'
+          size="xs"
           variant="destructive"
           // disabled={!password || isLoading}
           disabled={confirmationText !== "Delete account" || isLoading}
           onClick={() => {
-            if (currentUser) handleDeleteUser({uid:currentUser.uid,setIsLoading});
+            if (userId) deleteUser({ userId, setIsLoading });
           }}
         />
       </div>
     </div>
   );
 };
-
 
 export default DeleteUserDialog;

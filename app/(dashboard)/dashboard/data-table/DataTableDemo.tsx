@@ -33,7 +33,7 @@ import {
   // SelectScrollable,
   SelectDemo,
 } from "@/components/index.js";
-import { useFirebaseApiContext } from "@/context/FirebaseApiContext";
+import { useAuthContext } from "@/context/api/AuthContext";
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
@@ -41,7 +41,7 @@ interface DataTableProps<TData, TValue> {
 }
 
 type IncludedProps = {
-  details?: any;
+  data?: any;
 };
 
 export function DataTableDemo<TData extends IncludedProps, TValue>({ data, columns }: DataTableProps<TData, TValue>) {
@@ -138,7 +138,7 @@ export function DataTableDemo<TData extends IncludedProps, TValue>({ data, colum
                 <React.Fragment key={row.id}>
                   <TableRow
                     data-state={row.getIsSelected() && "selected"}
-                    className={`${expandedRows.includes(row.id) ? "!bg-gray-100 dark:!bg-transparent" : ""}`}
+                    className={`${expandedRows.includes(row.id) ? "bg-gray-100! dark:bg-transparent!" : ""}`}
                   >
                     <TableCell className=" ">
                       <Button
@@ -183,7 +183,7 @@ export function DataTableDemo<TData extends IncludedProps, TValue>({ data, colum
           callback={(item: { value: string | number }) => table.setPageSize(Number(item.value))}
         /> */}
         <SelectDemo
-           triggerClassName="w-[80px]"
+          triggerClassName="w-[80px]"
           contentClassName="min-w-[0px]"
           defaultItems={[5, 10, 20, 50, 100].map((size) => {
             return {
@@ -269,9 +269,10 @@ const ExpandedRow = ({ row = [], columns = [] }: { row: any; columns: any }) => 
   const [units, setUnits] = React.useState(row.units?.filter((item: any) => item.isFeatured));
 
   const { formatWithCommas } = useUtil();
+
   const {
-    fetchedCurrentUser: { details: fetchedCurrentUserDetails },
-  } = useFirebaseApiContext();
+    fetchedCurrentUser: { data },
+  } = useAuthContext();
 
   return (
     <tr className="">
@@ -285,14 +286,17 @@ const ExpandedRow = ({ row = [], columns = [] }: { row: any; columns: any }) => 
             <div className="mt-3 text-sm text-gray-500">
               <div className=" w-full lg:flex gap-10 ">
                 <div className="flex-1">
-                  <div className="flex items-center justify-between text-xs gap-5 px-3 border-b-1 border-dashed border-input  mb-3">
+                  <div className="flex items-center justify-between text-xs gap-5 px-3 border-b border-dashed border-input  mb-3">
                     <div className="font-bold">Name:</div>
                     <div>{row.displayName || "-"}</div>
                   </div>
-                  <div className="flex items-center justify-between text-xs gap-5 px-3 border-b-1 border-dashed border-input  mb-3">
+                  <div className="flex items-center justify-between text-xs gap-5 px-3 border-b border-dashed border-input  mb-3">
                     <div className="font-bold">Email:</div>
                     <div>
-                      {(row.email && ["admin", "superAdmin"].includes(fetchedCurrentUserDetails.role) && row.email) || "***"}
+                      {(row.email &&
+                        data.roles.some((role: string) => ["admin", "superAdmin"].includes(role)) &&
+                        row.email) ||
+                        "***"}
                     </div>
                   </div>
                 </div>

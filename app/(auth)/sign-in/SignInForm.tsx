@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { useFirebaseAuthContext } from "@/context/FirebaseAuthContext";
+import { useAuthContext } from "@/context/api/AuthContext";
 import Link from "next/link";
 import { ButtonDemo, InputDemo } from "@/components/index";
 import localData from "@/localData";
@@ -22,7 +22,7 @@ const SignInForm = () => {
   const [state, setState] = useState({ email: "", password: "" });
   const [isLoading, setIsLoading] = useState(false);
   const { successAlert } = useAlert();
-  const { handleSignIn, handleSignInWithGoogle } = useFirebaseAuthContext();
+  const { handleSignIn, handleSignInWithGoogle } = useAuthContext();
 
   const { validateSignIn } = useJoiValidation();
   const [wasSubmitted, setWasSubmitted] = useState(false);

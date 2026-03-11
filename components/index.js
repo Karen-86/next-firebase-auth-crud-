@@ -10,6 +10,7 @@ export { InputDemo } from "./input/InputDemo.tsx";
 export { TextareaDemo } from "./textarea/TextareaDemo.tsx";
 export { ModeToggle } from "./mode-toggle/ModeToggle.tsx";
 export { DropdownMenuDemo } from "./dropdown-menu/dropdown-menu-demo/DropdownMenuDemo.tsx";
+export { DropdownMenuCheckboxes } from "./dropdown-menu/dropdown-menu-checkboxes/DropdownMenuCheckboxes.tsx";
 export { DialogDemo } from "./dialog/DialogDemo.tsx";
 export { ControlledDialogDemo } from "./dialog/ControlledDialogDemo.tsx";
 export { SelectDemo } from "./select/select/SelectDemo.tsx";

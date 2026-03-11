@@ -1,18 +1,20 @@
 import React, { useState, useEffect } from "react";
 import localData from "@/localData";
-import { useFirebaseApiContext } from "@/context/FirebaseApiContext";
-import { useFirebaseAuthContext } from "@/context/FirebaseAuthContext";
+import { useAuthContext } from "@/context/api/AuthContext";
 import { ButtonDemo, DialogDemo, InputDemo, TextareaDemo, CropDemo } from "@/components/index";
 import { Camera, X } from "lucide-react";
 import { DeleteUserDialog } from "../delete-user-dialog/DeleteUserDialog";
 import useUtil from "@/hooks/useUtil";
+import { useUsersContext } from "@/context/api/UsersContext";
+import { useBannersContext } from "@/context/api/BannersContext";
+import useAlert from "@/hooks/useAlert";
 
 const { bannerPlaceholderImage, avatarPlaceholderImage } = localData.images;
 
 const ProfileHeader = () => {
   const {
-    fetchedCurrentUser: { details },
-  } = useFirebaseApiContext();
+    fetchedCurrentUser: { data },
+  } = useAuthContext();
 
   return (
     <div className="profile-header ">
@@ -20,14 +22,14 @@ const ProfileHeader = () => {
         {true && (
           <img
             className="banner absolute top-0 left-0 w-full h-full object-cover rounded-lg border"
-            src={details?.collectionMedia?.base64URL || bannerPlaceholderImage}
+            src={data?.banner?.base64URL || bannerPlaceholderImage}
             alt=""
           />
         )}
         <div className=" w-[25%]  lg:w-[170px]  left-[5%]  absolute avatar translate-y-[50%] bottom-0 ">
           <div className="  w-[100%] h-0 pt-[100%] relative rounded-full border-2 border-white shadow-[0_0_6px_rgba(0,0,0,0.3)] overflow-hidden ">
             <img
-              src={details.base64PhotoURL || details.photoURL || avatarPlaceholderImage}
+              src={data.base64PhotoURL || data.photoURL || avatarPlaceholderImage}
               className="block absolute bg-gray-50 top-0 left-0 w-full h-full object-cover"
               alt=""
             />
@@ -37,13 +39,13 @@ const ProfileHeader = () => {
       <div className="flex justify-end mt-3 mb-[15px] sm:mb-[5%] md:mb-[3%]">
         <div className="">
           <EditProfileDialog />
-          <DeleteUserDialog id={details.uid} />
+          <DeleteUserDialog userId={data.id} />
         </div>
       </div>
 
       <div className="md:pl-10 mb-10">
-        <h2 className="font-bold text-2xl">{details.displayName}</h2>
-        <div className="text-sm max-w-[380px] font-medium text-gray-500">{details.bio}</div>
+        <h2 className="font-bold text-2xl">{data.displayName}</h2>
+        <div className="text-sm max-w-[380px] font-medium text-gray-500">{data.bio}</div>
       </div>
     </div>
   );
@@ -75,25 +77,28 @@ type StateProps = {
 };
 
 const EditProfileContent = ({ closeDialog = () => {} }) => {
-  const { fetchedCurrentUser, updateUser, updateUserSubCollection, getUser } = useFirebaseApiContext();
+  const { updateUser } = useUsersContext();
+  const { upsertBanner, getBanners } = useBannersContext();
+  const { fetchedCurrentUser, getProfile } = useAuthContext();
   const { convertToBase64, resizeBase64Image } = useUtil();
-  const { details } = fetchedCurrentUser;
+  const { data } = fetchedCurrentUser;
+  const { successAlert } = useAlert();
 
   const [state, setState] = useState<StateProps>({
-    // isAvatarExist: details.base64PhotoURL || details.photoURL,
+    // isAvatarExist: data.base64PhotoURL || data.photoURL,
     isAvatarRemoved: false,
-    newAvatar: details.base64PhotoURL || details.photoURL || avatarPlaceholderImage,
+    newAvatar: data.base64PhotoURL || data.photoURL || avatarPlaceholderImage,
 
     // isBannerExist: false,
     isBannerRemoved: false,
-    newBanner: details?.collectionMedia?.base64URL || bannerPlaceholderImage,
+    newBanner: data?.banner?.base64URL || bannerPlaceholderImage,
 
     name: "",
     bio: "",
   });
 
   const [isLoading, setIsLoading] = useState(false);
-  const { currentUser } = useFirebaseAuthContext();
+  const { currentUser } = useAuthContext();
 
   const [src, setSrc] = useState("");
   const [croppedImageSrc, setCroppedImageSrc] = useState("");
@@ -127,36 +132,27 @@ const EditProfileContent = ({ closeDialog = () => {} }) => {
     }));
   };
 
-  const onSubmit = (e: React.FormEvent) => {
+  const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setIsLoading(true);
 
-    // AVATAR AND REST
-    const updatedFields: { [key: string]: any } = {};
+    // USER
+    const fields: { [key: string]: any } = {};
 
     if (state.newAvatar !== avatarPlaceholderImage) {
-      updatedFields.base64PhotoURL = state.newAvatar;
+      fields.base64PhotoURL = state.newAvatar;
     }
     if (state.isAvatarRemoved) {
-      updatedFields.base64PhotoURL = "";
-      // updatedFields.photoURL = "";
+      fields.base64PhotoURL = "";
+      // fields.photoURL = "";
     }
 
-    if (state.name !== details.displayName) {
-      updatedFields.displayName = state.name;
+    if (state.name !== data.displayName) {
+      fields.displayName = state.name;
     }
-    if (state.bio !== details.bio) {
-      updatedFields.bio = state.bio;
+    if (state.bio !== data.bio) {
+      fields.bio = state.bio;
     }
-
-    updateUser({
-      id: currentUser?.uid,
-      updatedFields,
-      setIsLoading,
-      callback: () => {
-        closeDialog();
-        getUser({ id: currentUser?.uid });
-      },
-    });
 
     // BANNER
     const updatedBannerFields: { [key: string]: any } = {};
@@ -168,24 +164,25 @@ const EditProfileContent = ({ closeDialog = () => {} }) => {
       updatedBannerFields.base64URL = "";
     }
 
-    updateUserSubCollection({
-      userId: currentUser?.uid,
-      collectionName: "media",
-      collectionId: "banner",
-      updatedFields: updatedBannerFields,
-      setIsLoading,
-      callback: () => {
-        // closeDialog();
-        getUser({ id: currentUser?.uid });
-      },
-    });
+    // REQUESTS
+    await Promise.all([
+      updateUser({ userId: currentUser?.uid, fields, hideAlert: true }),
+      updatedBannerFields.base64URL &&
+        upsertBanner({ bannerId: "banner-" + currentUser?.uid, fields: { ...updatedBannerFields } }),
+    ]);
+
+    successAlert("User has been updated successfully.");
+
+    closeDialog();
+    getProfile();
+    setIsLoading(false);
   };
 
   useEffect(() => {
     setState((prev) => ({
       ...prev,
-      name: details.displayName,
-      bio: details.bio,
+      name: data.displayName || "",
+      bio: data.bio || "",
     }));
   }, [fetchedCurrentUser]);
 
@@ -209,7 +206,7 @@ const EditProfileContent = ({ closeDialog = () => {} }) => {
 
       <div className="profile-header mb-[70px]">
         <div className="relative h-0 pt-[30%]">
-          <div className="absolute top-0 left-0 w-full h-0 pt-[30%]  bg-gray-100 rounded-lg overflow-hidden" >
+          <div className="absolute top-0 left-0 w-full h-0 pt-[30%]  bg-gray-100 rounded-lg overflow-hidden">
             {true && (
               <img
                 className="banner absolute top-0 left-0 w-full h-full object-cover rounded-lg border"
@@ -221,7 +218,6 @@ const EditProfileContent = ({ closeDialog = () => {} }) => {
 
             <div className="banner-options  absolute top-[50%] right-0 transform-[translateY(-50%)] mr-5 flex  gap-1">
               <ButtonDemo
-                
                 onClick={() => {
                   const input = document.querySelector("#upload-banner") as HTMLInputElement | null;
                   input?.click();
@@ -232,7 +228,6 @@ const EditProfileContent = ({ closeDialog = () => {} }) => {
               <input id="upload-banner" type="file" accept="image/*" onChange={onSelectFileBanner} className="hidden" />
               {state.newBanner !== bannerPlaceholderImage && !state.isBannerRemoved && (
                 <ButtonDemo
-                  
                   startIcon={<X />}
                   className=" rounded-full w-[30px] sm:w-[35px] h-[30px] sm:h-[35px] bg-[rgba(0,0,0,0.7)] hover:bg-[rgba(0,0,0,0.8)] !shadow-none"
                   onClick={() => {
@@ -249,7 +244,11 @@ const EditProfileContent = ({ closeDialog = () => {} }) => {
 
           <div className="avatar-options w-[25%] left-[5%]  absolute avatar translate-y-[50%] bottom-0 ">
             <div className="  w-[100%] h-0 pt-[100%] relative rounded-full border-2 border-white shadow-[0_0_6px_rgba(0,0,0,0.3)] overflow-hidden ">
-              <img src={state.newAvatar} className="block absolute bg-gray-50 top-0 left-0 w-full h-full object-cover" alt="" />
+              <img
+                src={state.newAvatar}
+                className="block absolute bg-gray-50 top-0 left-0 w-full h-full object-cover"
+                alt=""
+              />
               <div className="absolute top-0 left-0 w-full h-full bg-[rgba(0,0,0,0.3)] pointer-events-none"></div>
 
               <div className="absolute top-[50%] left-[50%] transform-[translate(-50%,-50%)] flex  gap-1">

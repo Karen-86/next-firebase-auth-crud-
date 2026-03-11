@@ -1,13 +1,13 @@
 "use client";
 
-import React, {  useState } from "react";
-import { useFirebaseAuthContext } from "@/context/FirebaseAuthContext";
-import { useFirebaseApiContext } from "@/context/FirebaseApiContext";
-import { ButtonDemo,  DialogDemo,  CropAvatarDialog } from "@/components/index";
+import React, { useState } from "react";
+import { useAuthContext } from "@/context/api/AuthContext";
+import { ButtonDemo, DialogDemo, CropAvatarDialog } from "@/components/index";
 import useUtil from "@/hooks/useUtil";
 import localData from "@/localData";
+import { useUsersContext } from "@/context/api/UsersContext";
 
-const {  avatarPlaceholderImage } = localData.images;
+const { avatarPlaceholderImage } = localData.images;
 
 // UPDATE PROFILE
 type StateProps = {
@@ -27,17 +27,18 @@ const UpdateProfileDialog = () => {
 };
 
 const UpdateProfileContent = ({ closeDialog = () => {} }) => {
-  const { fetchedCurrentUser, updateUser,  getUser } = useFirebaseApiContext();
-  const { convertToBase64, resizeBase64Image } = useUtil();
-  const { details } = fetchedCurrentUser;
+  const { updateUser } = useUsersContext();
+  const { getProfile, fetchedCurrentUser } = useAuthContext();
+  const { convertToBase64 } = useUtil();
+  const { data } = fetchedCurrentUser;
 
   const [state, setState] = useState<StateProps>({
     isAvatarRemoved: false,
-    newAvatar: details.base64PhotoURL || details.photoURL || avatarPlaceholderImage,
+    newAvatar: data.base64PhotoURL || data.photoURL || avatarPlaceholderImage,
   });
 
   const [isLoading, setIsLoading] = useState(false);
-  const { currentUser } = useFirebaseAuthContext();
+  const { currentUser } = useAuthContext();
 
   const [src, setSrc] = useState("");
   const [croppedImageSrc, setCroppedImageSrc] = useState("");
@@ -53,23 +54,23 @@ const UpdateProfileContent = ({ closeDialog = () => {} }) => {
   };
 
   const onSubmit = () => {
-    const updatedFields: { [key: string]: any } = {};
+    const fields: { [key: string]: any } = {};
 
     if (state.newAvatar !== avatarPlaceholderImage) {
-      updatedFields.base64PhotoURL = state.newAvatar;
+      fields.base64PhotoURL = state.newAvatar;
     }
     if (state.isAvatarRemoved) {
-      updatedFields.base64PhotoURL = "";
-      // updatedFields.photoURL = "";
+      fields.base64PhotoURL = "";
+      // fields.photoURL = "";
     }
 
     updateUser({
-      id: currentUser?.uid,
-      updatedFields,
+      userId: currentUser?.uid,
+      fields,
       setIsLoading,
       callback: () => {
         closeDialog();
-        getUser({ id: currentUser?.uid });
+        getProfile();
       },
     });
   };
@@ -88,7 +89,11 @@ const UpdateProfileContent = ({ closeDialog = () => {} }) => {
       <div className="grid grid-cols-[auto_1fr] gap-5 mb-[1.5rem]">
         <div className="avatar-options avatar w-[48px]">
           <div className="  w-[100%] h-0 pt-[100%] relative rounded-full  shadow-[0_0_6px_rgba(0,0,0,0.3)] overflow-hidden ">
-            <img src={state.newAvatar} className="block absolute bg-gray-50 top-0 left-0 w-full h-full object-cover" alt="" />
+            <img
+              src={state.newAvatar}
+              className="block absolute bg-gray-50 top-0 left-0 w-full h-full object-cover"
+              alt=""
+            />
             {/* <div className="absolute top-0 left-0 w-full h-full bg-[rgba(0,0,0,0.3)] pointer-events-none"></div> */}
           </div>
         </div>

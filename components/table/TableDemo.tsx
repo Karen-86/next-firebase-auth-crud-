@@ -63,9 +63,9 @@ const { penIcon } = localData.svgs;
 
 type InvoicesProps = {
   invoices: {
-    invoice: string;
-    name: string;
-    href: string;
+    invoice: string ;
+    name: string | React.ReactNode;
+    href: string ;
     isDisabled?: boolean;
   }[];
 };

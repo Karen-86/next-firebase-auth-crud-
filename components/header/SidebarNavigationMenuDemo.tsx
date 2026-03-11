@@ -5,10 +5,10 @@ import { SheetDemo, AccordionDemo, NavUserDemo, ButtonDemo } from "@/components/
 import { Menu, MoreVertical  } from "lucide-react";
 import { usePathname } from "next/navigation";
 import { navLinks, dropdownLinksModules } from "./Navbar";
-import { useFirebaseAuthContext } from "@/context/FirebaseAuthContext";
+import { useAuthContext } from "@/context/api/AuthContext";
 
 export function SidebarNavigationMenuDemo() {
-  const { currentUser } = useFirebaseAuthContext();
+  const { currentUser } = useAuthContext();
   const pathname = usePathname();
 
   return (

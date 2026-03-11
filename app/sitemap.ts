@@ -1,10 +1,10 @@
-import { fetchBlogs } from "@/lib/fetchers/blogs";
+import * as blogFetchers from "@/lib/fetchers/blogs"
 import { Blog } from "@/types/index";
 import { MetadataRoute } from "next";
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const { data } = await fetchBlogs();
+  const { data } = await blogFetchers.fetchBlogs();
   const blogList: Blog[] = data;
   const blogEntries: MetadataRoute.Sitemap = blogList.map((blog: any) => ({
     url: `${siteUrl}/blog/${blog.slug}`,

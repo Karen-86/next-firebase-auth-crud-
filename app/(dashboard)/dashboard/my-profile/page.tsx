@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { useFirebaseApiContext } from "@/context/FirebaseApiContext";
+import { useAuthContext } from "@/context/api/AuthContext";
 import { BreadcrumbDemo, Separator } from "@/components/index";
 import { Card, CardHeader, CardContent } from "@/components/ui/card";
 import useUtil from "@/hooks/useUtil";
@@ -37,8 +37,8 @@ const Page = () => {
 
 // USER INFO BLOCK
 const UserInfoBlock = () => {
-  const { fetchedCurrentUser } = useFirebaseApiContext();
-  const { details } = fetchedCurrentUser;
+  const { fetchedCurrentUser } = useAuthContext();
+  const { data } = fetchedCurrentUser;
   const { formatWithCommas } = useUtil();
 
   return (
@@ -50,11 +50,11 @@ const UserInfoBlock = () => {
         <div className=" max-w-[500px] w-full ">
           <div className="flex items-center justify-between text-sm gap-5 py-1 px-3 border-b-1 border-dashed border-input  mb-3">
             <div className="font-bold">Name:</div>
-            <div>{details.displayName || "-"}</div>
+            <div>{data.displayName || "-"}</div>
           </div>
           <div className="flex items-center justify-between text-sm gap-5 py-1 px-3 border-b-1 border-dashed border-input  mb-3">
             <div className="font-bold">Email:</div>
-            <div>{details.email || "-"}</div>
+            <div>{data.email || "-"}</div>
           </div>
         </div>
       </div>

@@ -8,8 +8,11 @@ import {
   SelectDemo,
   // SelectScrollable
 } from "@/components/index";
-import { useFirebaseAuthContext } from "@/context/FirebaseAuthContext";
-import { useFirebaseApiContext } from "@/context/FirebaseApiContext";
+import { useAuthContext } from "@/context/api/AuthContext";
+import { useUsersContext } from "@/context/api/UsersContext";
+
+import { DropdownMenuCheckboxes } from "@/components/index.js";
+import { ChevronDown } from "lucide-react";
 
 export const SetupUserDialog = ({ user = {} }) => {
   return (
@@ -20,16 +23,22 @@ export const SetupUserDialog = ({ user = {} }) => {
 };
 
 type StateProps = {
-  role: string;
+  roles: any;
 };
 
 const SetupUserDialogContent = ({ user = {}, closeDialog = () => {} }: { user: any; closeDialog: () => void }) => {
-  const { updateUser, getUser } = useFirebaseApiContext();
-  const { currentUser } = useFirebaseAuthContext();
+  const { updateUserRoles } = useUsersContext();
+  const {
+    currentUser,
+    getProfile,
+    fetchedCurrentUser: { data },
+  } = useAuthContext();
 
   const [state, setState] = useState<StateProps>({
-    role: user.role,
+    roles: user.roles,
   });
+
+  const [defaultRoles, setDefaultRoles] = useState<any>([]);
 
   const [isLoading, setIsLoading] = useState(false);
 
@@ -43,35 +52,63 @@ const SetupUserDialogContent = ({ user = {}, closeDialog = () => {} }: { user: a
   const onSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
-    const updatedFields: { [key: string]: any } = {};
+    const fields: { [key: string]: any } = {};
 
-    if (state.role !== user.role) {
-      updatedFields.role = state.role;
-    }
+    if (state.roles !== user.roles) fields.roles = state.roles;
 
-    updateUser({
-      id: user.id,
-      updatedFields,
+    updateUserRoles({
+      userId: user.id,
+      fields,
       setIsLoading,
       callback: () => {
         closeDialog();
-        getUser({ id: currentUser?.uid });
+        getProfile();
       },
     });
+  };
+
+  const callback = (items: any) => {
+    setState((prev) => ({
+      ...prev,
+      roles: items.filter((role: any) => role.isChecked).map((role:any)=>role.name)
+    }));
   };
 
   useEffect(() => {
     setState((prev) => ({
       ...prev,
-      role: user.role,
+      roles: user.roles,
     }));
+
+    setDefaultRoles(
+      [
+        { id: "1", name: "user", isChecked: false },
+        { id: "2", name: "admin", isChecked: false },
+      ].map((role): any => ({
+        id: role.id,
+        name: role.name,
+        isChecked: user.roles.includes(role.name),
+      })),
+    );
   }, [user]);
 
   return (
     <div className="crop-avatar-dialog">
-      <h2 className="text-2xl !font-semibold mb-5">Change user settings</h2>
+      <h2 className="text-2xl font-semibold! mb-5">Change user settings</h2>
       <form onSubmit={onSubmit} className={`${""}`}>
-        {currentUser?.uid !== user.id && (
+        <DropdownMenuCheckboxes
+          defaultItems={defaultRoles}
+          callback={callback}
+          triggerClassName={`w-full mb-10`}
+          contentClassName={`w-full! mx-0 max-w-full!`}
+          trigger={
+            <ButtonDemo text="Assign Roles" className="justify-between" variant="outline" endIcon={<ChevronDown />} />
+          }
+          // side="right"
+          // align="end"
+        />
+
+        {/* {currentUser?.uid !== user.id && (
           <SelectDemo
             label="Select"
             defaultItems={["user", "admin"].map((role) => {
@@ -81,7 +118,7 @@ const SetupUserDialogContent = ({ user = {}, closeDialog = () => {} }: { user: a
                 isSelected: state.role == role,
               };
             })}
-          callback={({value}) => {
+            callback={({ value }) => {
               setState((prev) => ({
                 ...prev,
                 role: value.toString(),
@@ -90,7 +127,7 @@ const SetupUserDialogContent = ({ user = {}, closeDialog = () => {} }: { user: a
             className="mb-5"
             contentClassName={`custom-content`}
           />
-        )}
+        )} */}
 
         {/* {currentUser?.uid !== user.id && (
           <SelectScrollable

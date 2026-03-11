@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { useFirebaseAuthContext } from "@/context/FirebaseAuthContext";
+import { useAuthContext } from "@/context/api/AuthContext";
 import { ButtonDemo, InputDemo, BreadcrumbDemo, DialogDemo, TooltipDemo, CropAvatarDialog } from "@/components/index";
 import useJoiValidation from "@/hooks/useJoiValidation";
 
@@ -26,7 +26,7 @@ const UpdateEmailDialog = () => {
 const UpdateEmailContent = ({ closeDialog = () => {} }) => {
   const [state, setState] = useState({ email: "" });
   const [isLoading, setIsLoading] = useState(false);
-  const { handleUpdateEmail } = useFirebaseAuthContext();
+  const { handleUpdateEmail } = useAuthContext();
 
   const { validateUpdateEmail } = useJoiValidation();
   const [wasSubmitted, setWasSubmitted] = useState(false);

@@ -7,12 +7,10 @@ import {
   DialogDemo,
   InputDemo,
 } from "@/components/index";
-import localData from "@/localData";
-import { Card, CardHeader, CardContent } from "@/components/ui/card";
 import { Settings, Pencil, Expand } from "lucide-react";
-import { useFirebaseApiContext } from "@/context/FirebaseApiContext";
-import { useFirebaseAuthContext } from "@/context/FirebaseAuthContext";
+import { useAuthContext } from "@/context/api/AuthContext";
 import useUtil from "@/hooks/useUtil";
+import { useUsersContext } from "@/context/api/UsersContext";
 
 type StateProps = {
   inGameID: string;
@@ -39,9 +37,9 @@ const UserInfoDialogContent = ({ closeDialog = () => {} }) => {
   });
 
   const [isLoading, setIsLoading] = useState(false);
-  const { fetchedPages, fetchedCurrentUser, updateUser, getUser } = useFirebaseApiContext();
-  const { currentUser } = useFirebaseAuthContext();
-  const { details } = fetchedCurrentUser;
+  const {  updateUser,  } = useUsersContext();
+  const { currentUser,fetchedCurrentUser, getProfile } = useAuthContext();
+  const { data } = fetchedCurrentUser;
 
   const { formatWithCommas, unformatFromCommas } = useUtil();
 
@@ -65,19 +63,19 @@ const UserInfoDialogContent = ({ closeDialog = () => {} }) => {
   const onSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
-    const updatedFields: { [key: string]: any } = {};
+    const fields: { [key: string]: any } = {};
 
-    if (state.inGameID !== details.inGameID) {
-      updatedFields.inGameID = state.inGameID;
+    if (state.inGameID !== data.inGameID) {
+      fields.inGameID = state.inGameID;
     }
 
     updateUser({
-      id: currentUser?.uid,
-      updatedFields,
+      userId: currentUser?.uid,
+      fields,
       setIsLoading,
       callback: () => {
         closeDialog();
-        getUser({ id: currentUser?.uid });
+        getProfile();
       },
     });
   };
@@ -85,8 +83,8 @@ const UserInfoDialogContent = ({ closeDialog = () => {} }) => {
   useEffect(() => {
     setState((prev) => ({
       ...prev,
-      name: details.displayName || "",
-      inGameID: details.inGameID || "",
+      name: data.displayName || "",
+      inGameID: data.inGameID || "",
     }));
   }, [fetchedCurrentUser]);
 
